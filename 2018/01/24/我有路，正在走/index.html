@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          [Hexo] Theme BeanTech - 普帅同学的博客|puqin’s blog
+          我有路，正在走 - 普帅同学的博客|puqin’s blog
         
     </title>
 
-    <link rel="canonical" href="https://puqin2333.github.io/2017/03/18/hexo-theme-beantech/">
+    <link rel="canonical" href="https://puqin2333.github.io/2018/01/24/我有路，正在走/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -69,7 +69,7 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('Demo.png')
+            background-image: url('null')
             /*post*/
         
     }
@@ -95,11 +95,11 @@
                               <a class="tag" href="/tags/#Blog" title="Blog">Blog</a>
                             
                         </div>
-                        <h1>[Hexo] Theme BeanTech</h1>
-                        <h2 class="subheading">This is hexo theme Demo.</h2>
+                        <h1>我有路，正在走</h1>
+                        <h2 class="subheading">个人介绍</h2>
                         <span class="meta">
                             Posted by Puqin Chen on
-                            2017-03-18
+                            2018-01-24
                         </span>
                     </div>
                 
@@ -216,60 +216,79 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <blockquote>
-<p>Ported Theme of <a href="https://github.com/Huxpro/huxpro.github.io" target="_blank" rel="noopener">Hux Blog</a>, Thank <a href="https://github.com/Huxpro" target="_blank" rel="noopener">Huxpro</a> for designing such a flawless theme.</p>
-<p>This BeanTech theme created by <a href="http://beantech.org" target="_blank" rel="noopener">YuHsuan</a> modified from the original Porter <a href="http://kaijun.rocks/hexo-theme-huxblog/" target="_blank" rel="noopener">Kaijun</a></p>
+                <p>UITableView 可以算的上是我们做开发过程中用的最多的控件了。当然，它也引出了好多知识。想要写好一个 UITableView，就必须掌握这些知识。</p>
+<h2><span id="uitableview-概述">UITableView 概述</span></h2>
+<p>有关基本的知识，大家可以看<a href="http://plainboiledwaterln.cn/iOSUI/UITableView.html" target="_blank" rel="noopener">这篇文章</a></p>
+<h2><span id="uitableviewcell-的优化">UITableViewCell 的优化</span></h2>
+<p>UITableView 的优化大致从四个方面入手：</p>
+<ul>
+<li>UITableViewCell 的复用</li>
+<li>提前计算并缓存好高度（布局）</li>
+<li>异步绘制界面</li>
+<li>滑动时按需加载，异步加载网络资源和图片</li>
+</ul>
+<p>除此之外，还有其他大家经常用的优化点：</p>
+<ul>
+<li>尽量使所有的 view 都不透明，包括 cell 本身；</li>
+<li>尽量少用或者不用不透明图层</li>
+<li>减少 subViews 的数量</li>
+<li>在 <code>heightForRowAtIndexPath:</code> 中尽量不使用 <code>cellForRowAtIndexPath:</code>,如果需要，只用一次然后缓存结果</li>
+<li>尽量少用 addView 给 cell 动态添加 View，可以初始化时就添加，然后通过 hide 来控制是否需要显示。</li>
+</ul>
+<h2><span id="uitableviewcell-的重用">UITableViewCell 的重用</span></h2>
+<blockquote>
+<p>复用机制大体是这样:UITableView首先加载一屏幕(假设UITableView的大小是整个屏幕的大小)所需要的UITableViewCell,具体个数要根据每个cell的高度而定，总之肯定要铺满整个屏幕,更准确说当前加载的cell的高度要大于屏幕高度。然后你往上滑动，想要查看更多的内容，那么肯定需要一个新的cell放在已经存在内容的下边。这时候先不去生成，而是先去UITableView自己的一个资源池里去获取。这个资源池里放了已经生成的而且能用的cell。如果资源池是空的话才会主动生成一个新的cell。那么这个资源池里的cell又来自哪里呢？当你滑动时视图是，位于最顶部的cell会相应的往上滑动，直到它彻底消失在屏幕上，消失的cell去了哪里呢？你肯定想到了，是的，它被UITableView放到资源池里了。其他cell也是这样，只要一滑出屏幕就放入资源池。这样，有进有出，总共需要大约一屏幕多一两个的cell就够了。</p>
 </blockquote>
-<h1><span id="live-demo"></span></h1>
-<hr>
-<p><img src="http://beantech.org/img/beantech-desktop.png" alt="BeanTech Desktop"></p>
-<h1><span id="usage">Usage</span></h1>
-<hr>
-<p>I publish the whole project for your convenience, so you can just follow the instruction down below, then you can easily customiz your own blog!</p>
-<p>Let’s begin!!!</p>
-<h2><span id="init">Init</span></h2>
-<hr>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/YenYuHsuan/hexo-theme-beantech.git ./hexo-beantech</span><br><span class="line"><span class="built_in">cd</span> hexo-beantech</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure>
-<h2><span id="modify">Modify</span></h2>
-<hr>
-<p>Modify <code>_config.yml</code> file with your own info.<br>
-Especially the section:</p>
-<h3><span id="deployment">Deployment</span></h3>
-<p>Replace to your own repo!</p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line"><span class="attr">  type:</span> <span class="string">git</span></span><br><span class="line"><span class="attr">  repo:</span> <span class="attr">https://github.com/&lt;yourAccount&gt;/&lt;repo&gt;</span></span><br><span class="line"><span class="attr">  branch:</span> <span class="string">&lt;your-branch&gt;</span></span><br></pre></td></tr></table></figure>
-<h3><span id="sidebar-settings">Sidebar settings</span></h3>
-<p>Copy your avatar image to <code>&lt;root&gt;/img/</code> and modify the <code>_config.yml</code>:</p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">sidebar:</span> <span class="literal">true</span>    <span class="comment"># whether or not using Sidebar.</span></span><br><span class="line"><span class="attr">sidebar-about-description:</span> <span class="string">"&lt;your description&gt;"</span></span><br><span class="line"><span class="attr">sidebar-avatar:</span> <span class="string">img/&lt;your</span> <span class="string">avatar</span> <span class="string">path&gt;</span></span><br></pre></td></tr></table></figure>
-<p>and activate your personal widget you like</p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">widgets:</span>         <span class="comment"># here are widget you can use, you can comment out</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">featured-tags</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">short-about</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">recent-posts</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">friends-blog</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">archive</span></span><br><span class="line"><span class="bullet">-</span> <span class="string">category</span></span><br></pre></td></tr></table></figure>
-<p>if you want to add sidebar widget, please add at <code>layout/_widget</code>.</p>
-<h3><span id="signature-setup">Signature Setup</span></h3>
-<p>Copy your signature image to <code>&lt;root&gt;/img/signature</code> and modify the <code>_config.yml</code>:</p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">signature:</span> <span class="literal">true</span>   <span class="comment"># show signature</span></span><br><span class="line"><span class="attr">signature-img:</span> <span class="string">img/signature/&lt;your-signature-ID&gt;</span></span><br></pre></td></tr></table></figure>
-<h3><span id="go-to-top-icon-setup">Go to top icon Setup</span></h3>
-<p>My icon is using iron man, you can change to your own icon at <code>css/image</code>.</p>
-<h3><span id="post-tag">Post tag</span></h3>
-<p>You can decide to show post tags or not.</p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">home_posts_tag:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
-<p><img src="home_posts_tag-true.png" alt="home_posts_tag-true"></p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">home_posts_tag:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure>
-<p><img src="home_posts_tag-false.png" alt="home_posts_tag-false"></p>
-<h3><span id="markdown-render">Markdown render</span></h3>
-<p>My markdown render engine plugin is <a href="https://github.com/celsomiranda/hexo-renderer-markdown-it" target="_blank" rel="noopener">hexo-renderer-markdown-it</a>.</p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Markdown-it config</span></span><br><span class="line"><span class="comment">## Docs: https://github.com/celsomiranda/hexo-renderer-markdown-it/wiki</span></span><br><span class="line"><span class="attr">markdown:</span></span><br><span class="line"><span class="attr">  render:</span></span><br><span class="line"><span class="attr">    html:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">    xhtmlOut:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">    breaks:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">    linkify:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">    typographer:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">    quotes:</span> <span class="string">'“”‘’'</span></span><br></pre></td></tr></table></figure>
-<p>and if you want to change the header anchor ‘ℬ’, you can go to <code>layout/post.ejs</code> to change it.</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span>(<span class="string">"https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js"</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        anchors.options = &#123;</span><br><span class="line">          visible: <span class="string">'hover'</span>,</span><br><span class="line">          placement: <span class="string">'left'</span>,</span><br><span class="line">          icon: ℬ <span class="comment">// this is the header anchor "unicode" icon</span></span><br><span class="line">        &#125;;</span><br></pre></td></tr></table></figure>
-<h2><span id="hexo-basics">Hexo Basics</span></h2>
-<hr>
-<p>Some hexo command:</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">hexo new post <span class="string">"&lt;post name&gt;"</span> <span class="comment"># you can change post to another layout if you want</span></span><br><span class="line">hexo clean &amp;&amp; hexo generate <span class="comment"># generate the static file</span></span><br><span class="line">hexo server <span class="comment"># run hexo in local environment</span></span><br><span class="line">hexo deploy <span class="comment"># hexo will push the static files automatically into the specific branch(gh-pages) of your repo!</span></span><br></pre></td></tr></table></figure>
-<h1><span id="have-fun-_">Have fun ^_^</span></h1>
-<hr>
-<!-- Place this tag in your head or just before your close body tag. -->
-<script async defer src="https://buttons.github.io/buttons.js"></script>
-<!-- Place this tag where you want the button to render. -->
-<p>Please <a class="github-button" href="https://github.com/YenYuHsuan/hexo-theme-beantech" data-icon="octicon-star" aria-label="Star YenYuHsuan/hexo-theme-beantech on GitHub" target="_blank" rel="noopener">Star</a> this Project if you like it! <a class="github-button" href="https://github.com/YenYuHsuan" aria-label="Follow @YenYuHsuan on GitHub" target="_blank" rel="noopener">Follow</a> would also be appreciated!<br>
-Peace!</p>
+<p><strong>注意点：</strong><br>
+设置 Cell 的存在差异性的那些属性（包括样式和内容）时，有了 if 最好就要有 else，要显式的覆盖所有可能性，并且代码要放在初始化代码块的外部。</p>
+<p><code>UITableView dequeueReusableCellWithIdentifier:forIndexPath:</code>需搭配  <code>UITableView registerClass:forCellReuseIdentifier:</code><br>
+或者<code>UITableView registerNib:forCellReuseIdentifier:</code><br>
+使用。</p>
+<p>当有可重用的 Cell时，前者直接拿来复用，并调用 <code>UITableViewCell prepareForReuse</code> 方法；当没有时，前者会调用 Identifier 对应的那个注册的 UITableViewCell 类的 <code>UITableViewCell initWithStyle:reuseIdentifier:</code>方法来初始化一个，这里省去了你自己初始化的步骤。当你自定义了一个 UITableViewCell的子类时，你可以这样来用。</p>
+<h2><span id="cell-的高度计算">cell 的高度计算</span></h2>
+<h3><span id="rowheight">rowHeight</span></h3>
+<p>UITableView 询问高度有两种方式：</p>
+<p>一种是针对所有 cell 具有固定高度的情况，通过：</p>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="literal">self</span>.<span class="built_in">table</span>View.rowHeight = <span class="number">80</span>;</span><br></pre></td></tr></table></figure>
+<p>或者实现 UITableViewDelegate 中的这个代理方法来实现</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">-</span> (CGFloat)<span class="selector-tag">tableView</span><span class="selector-pseudo">:(UITableView</span> *)<span class="selector-tag">tableView</span> <span class="selector-tag">heightForRowAtIndexPath</span><span class="selector-pseudo">:(NSIndexPath</span> *)<span class="selector-tag">indexPath</span> &#123;</span><br><span class="line">    <span class="comment">// return xxx</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>一般对于定高需求的表格，建议使用第一种方式保证不必要的高度计算和调用；当实现代理方法时，rowHeight 的设置会无效，适合具有多种 cell 高度的 UITableView。</p>
+<h3><span id="estimatedrowheight">estimatedRowHeight</span></h3>
+<p>官方文档这样描述道：</p>
+<blockquote>
+<p>If the table contains variable height rows, it might be expensive to calculate all their heights when the table loads. Using estimation allows you to defer some of the cost of geometry calculation from load time to scrolling time.</p>
+</blockquote>
+<p>翻译过来：如果表格包含可变高度的行，则在表格加载时计算其所有高度可能是昂贵的。使用估算功能可以将几何计算的一些成本从加载时间推迟到滚动时间。</p>
+<p>因为 UITableView 继承于 UIScrollView，就像平时使用 UIScrollView 一样，加载时指定 contentSize 后他才根据自己的 bounds、contentInset、contentOffset 等属性共同决定是否可以滑动以及滚动条的长度。而 UITableView 在一开始并不知道自己会被填充多少内容，于是询问 data source 个数和创建 cell,同时询问 delegate 这些 cell 应该显示的高度，这就造成了它在加载的时候浪费了多余的计算在屏幕外的 cell上。和 rowHeight 类似，它也有两种估算高度的方法：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 方法一</span></span><br><span class="line"><span class="keyword">self</span>.tableView.estimatedRowHeight = <span class="number">88</span>;</span><br><span class="line"><span class="comment">// 代理方法</span></span><br><span class="line">- (<span class="built_in">CGFloat</span>)tableView:(<span class="built_in">UITableView</span> *)tableView estimatedHeightForRowAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath &#123;</span><br><span class="line"><span class="comment">// return xxx</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>面对不同种类的 cell，我们依然可以使用简单的 estimatedRowHeight 属性赋值，只要整体估算值接近就可以。</p>
+<p>缺点:</p>
+<ul>
+<li>设置估算高度后， contentSize.height 会根据“cell 估算值 * cell个数” 计算，这会导致滚动条的大小处于不稳定的状态，contentSize 会随着滚动从估算高度慢慢替换成真实高度，肉眼可见滚动条突然变化甚至“跳跃”</li>
+<li>当存在设计不好的下拉刷新或上拉加载控件，或是 KVO 了 contentSize 或者 contentOffset 属性，有可能使表格滑动时跳动。</li>
+<li>估算高度会让加载速度会变快，但是会损害滑动的流畅性</li>
+</ul>
+<h3><span id="ios8-self-sizing-cell">iOS8 self-sizing cell</span></h3>
+<p>具有动态高度内容的 cell,如常见的聊天气泡，frame 布局时代通常是用数据内容反算高度：</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">CGFloat height</span> = textHeightWIthFont() + imageHeight + topMargin + bottomMargin + ····;</span><br></pre></td></tr></table></figure>
+<p>供 UITableViewDelegate 调用时也可能是个 cell 的类方法</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@interface</span> <span class="attribute">BubbleCell </span>: UITableViewCell</span><br><span class="line">+ (CGFloat)<span class="attribute">heightWithEntity</span>:(id)entity;</span><br><span class="line"><span class="variable">@end</span></span><br></pre></td></tr></table></figure>
+<p>各种魔法 margin 加上耦合了屏幕宽度。</p>
+<p>AutoLayout 时代，提供了 <code>-systemLayoutSizeFittingSize:</code> 的 API，在 contentView 中设置约束后，就能计算出准确的值；缺点是计算速度没有手算快，而且这是个实例方法，需要维护专门为计算高度而生的 template layout cell ,它还要求使用者对约束设置的比较熟练，要保证 contentView 内部上下左右所有的方向都有约束支撑，设置不合理的话计算的高度就成了 0。</p>
+<p>关于 UILabel 的问题：当 UILabel 行数大于 0 时，需要指定 <code>preferredMaxLayoutWidth</code> 后它才知道自己什么时候该折行。但是 UILabel 需要知道 superView 的宽度才能折行，而 superView 的宽度还依仗着 子View 的宽度的累加才能确定。那么这个问题怎么办呢？</p>
+<p>iOS8 WWDC 中推出了 self-sizing cell 的概念，旨在让 cell 自己负责自己的高度计算，我们使用 frame layout 和 auto layout 都可以享受到：</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/51530583jw1es3hwpsb71j20pe0f2ab4.jpg" alt="image"></p>
+<p>我们通过调用以下 API 来自动算高：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">self</span>.tableView.estimatedRowHeight = <span class="number">200</span>; <span class="comment">// 如果不加估算高度，自动算高就失效了</span></span><br><span class="line"><span class="keyword">self</span>.tableView.rowHeight = <span class="built_in">UITableViewAutomaticDimension</span>;</span><br></pre></td></tr></table></figure>
+<p>PS:iOS8 系统中 rowHeight 的默认值已经设置成了 UITableViewAutomaticDimension，所以第二行代码可以省略。</p>
+<h3><span id="ios8-后的算高机制">iOS8 后的算高机制</span></h3>
+<p>在 iOS8 之后，苹果认为 cell会随时改变高度，所以滑动出来之后都要重新计算高度。</p>
+<p>UITableView 的算高机制的改变：</p>
+<ul>
+<li>在不开启高度估算时，UITableView 上来就要对所有的 cell 调用算高来确定 contentSize</li>
+<li><code>dequeueReusableCellWithIdentifier:forIndexPath:</code> 相比不带 “forIndexPath” 的版本会多调用一次高度计算</li>
+<li>iOS7 计算高度后有“缓存”机制，不会重复计算；而 iOS8 不论何时都会重复计算 cell 高度。</li>
+</ul>
 
                 
 
@@ -277,10 +296,10 @@ Peace!</p>
                 <!-- Pager -->
                 <ul class="pager">
                     
-                        <li class="previous">
-                            <a href="/2018/01/24/我有路，正在走/" data-toggle="tooltip" data-placement="top" title="我有路，正在走">&larr; Previous Post</a>
-                        </li>
                     
+                        <li class="next">
+                            <a href="/2017/03/18/hexo-theme-beantech/" data-toggle="tooltip" data-placement="top" title="[Hexo] Theme BeanTech">Next Post &rarr;</a>
+                        </li>
                     
                 </ul>
 
@@ -309,7 +328,7 @@ Peace!</p>
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text"></span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">Usage</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">Init</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">Modify</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.1.</span> <span class="toc-nav-text">Deployment</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.2.</span> <span class="toc-nav-text">Sidebar settings</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.3.</span> <span class="toc-nav-text">Signature Setup</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.4.</span> <span class="toc-nav-text">Go to top icon Setup</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.5.</span> <span class="toc-nav-text">Post tag</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.6.</span> <span class="toc-nav-text">Markdown render</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.3.</span> <span class="toc-nav-text">Hexo Basics</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">Have fun ^_^</span></a></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">UITableView 概述</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">UITableViewCell 的优化</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">UITableViewCell 的重用</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">cell 的高度计算</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.1.</span> <span class="toc-nav-text">rowHeight</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.2.</span> <span class="toc-nav-text">estimatedRowHeight</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.3.</span> <span class="toc-nav-text">iOS8 self-sizing cell</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.4.</span> <span class="toc-nav-text">iOS8 后的算高机制</span></a></li></ol></li></ol>
         
         </div>
       </aside>
@@ -366,8 +385,8 @@ Peace!</p>
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES * * */
     var disqus_shortname = "your-disqus-ID";
-    var disqus_identifier = "https://puqin2333.github.io/2017/03/18/hexo-theme-beantech/";
-    var disqus_url = "https://puqin2333.github.io/2017/03/18/hexo-theme-beantech/";
+    var disqus_identifier = "https://puqin2333.github.io/2018/01/24/我有路，正在走/";
+    var disqus_url = "https://puqin2333.github.io/2018/01/24/我有路，正在走/";
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
