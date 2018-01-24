@@ -2,17 +2,17 @@
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
     <sitemap>
-        <loc>http://yoursite-url/post-sitemap.xml</loc>
+        <loc>https://puqin2333.github.io/post-sitemap.xml</loc>
         <lastmod>2018-01-24T13:11:46.002Z</lastmod>
     </sitemap>
 
     <sitemap>
-        <loc>http://yoursite-url/page-sitemap.xml</loc>
+        <loc>https://puqin2333.github.io/page-sitemap.xml</loc>
         <lastmod>2018-01-24T13:11:46.079Z</lastmod>
     </sitemap>
 
     <sitemap>
-        <loc>http://yoursite-url/tag-sitemap.xml</loc>
+        <loc>https://puqin2333.github.io/tag-sitemap.xml</loc>
         <lastmod>2018-01-24T13:11:46.002Z</lastmod>
     </sitemap>
 
