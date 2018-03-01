@@ -7,22 +7,22 @@
     </url>
     
     <url>
-        <loc>https://puqin2333.github.io/tags/</loc>
-        <lastmod>2018-01-24T13:11:46.079Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    
-    <url>
         <loc>https://puqin2333.github.io/about/</loc>
-        <lastmod>2018-01-24T13:11:46.022Z</lastmod>
+        <lastmod>2018-03-01T14:47:20.543Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     
     <url>
         <loc>https://puqin2333.github.io/archive/</loc>
-        <lastmod>2018-01-24T13:11:46.022Z</lastmod>
+        <lastmod>2018-03-01T14:47:14.700Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://puqin2333.github.io/tags/</loc>
+        <lastmod>2018-03-01T14:45:01.912Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
