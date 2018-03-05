@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          “KVC/KVO的使用以及实现原理” - 普帅同学的博客|puqin’s blog
+        
+    </title>
+
+    <link rel="canonical" href="https://puqin2333.github.io/2018/03/05/“KVC-KVO的使用以及实现原理”/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('null')
+            /*post*/
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
+                            
+                        </div>
+                        <h1>“KVC/KVO的使用以及实现原理”</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by Puqin Chen on
+                            2018-03-05
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">普帅同学的博客</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h3><span id="概念">概念</span></h3>
+<ul>
+<li>
+<p>KVC ： 即 Key-Value-Coding，用于键值编码。作为 cocoa 的一个标准化组成部分，它是基于 NSKeyValueCoding 非正式协议的机制。简单来说，就是直接通过 key  值对对象的属性进行存取操作，而不需要调用明确的存取方法（set 和 get 方法 ）。基本上所有的 OC 对象都支持 KVC。</p>
+</li>
+<li>
+<p>KVO ： 即 Key-Value-Observing ，键值观察。回调机制，当指定的对象属性（内存地址/常量改变）被修改后，对象就会受到通知。使用 KVO 机制的前提：必须能支持 KVC 机制；另外，在 MVC 设计架构中， KVO 适合 在 Model 和 Controller 之间通讯。</p>
+</li>
+</ul>
+<h3><span id="kvc-kvo-的使用">KVC /  KVO 的使用</span></h3>
+<p>其实，我们经常会用到 KVC 和 KVO 机制来解决实际开发中的好多问题，尤其是 KVC，因为这种基于运行时的编程方式大大地提高了灵活性，简化代码；比如，我们经常会用如下代码来修改 textField 的 placeHolder 的字体和颜色等属性。</p>
+<figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[<span class="name">self</span> setValue:[<span class="name">UIColor</span> whiteColor] forKeyPath:@<span class="string">"_placeholderLabel.textColor"</span>]<span class="comment">;</span></span><br><span class="line">[<span class="name">self</span> setValue:[<span class="name">UIFont</span> boldSystemFontOfSize:20] forKeyPath:@<span class="string">"_placeholderLabel.font"</span>]<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p>下面，来为大家列举一下 KVC / KVO 的使用场景</p>
+<h4><span id="kvc的使用">KVC的使用</span></h4>
+<p>KVC 的常用的方法：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">nullable</span> <span class="keyword">id</span>)valueForKey:(<span class="built_in">NSString</span> *)key;                          <span class="comment">//直接通过Key来取值</span></span><br><span class="line">- (<span class="keyword">void</span>)setValue:(<span class="keyword">nullable</span> <span class="keyword">id</span>)value forKey:(<span class="built_in">NSString</span> *)key;          <span class="comment">//通过Key来设值</span></span><br><span class="line">- (<span class="keyword">nullable</span> <span class="keyword">id</span>)valueForKeyPath:(<span class="built_in">NSString</span> *)keyPath;                  <span class="comment">//通过KeyPath来取值</span></span><br><span class="line">- (<span class="keyword">void</span>)setValue:(<span class="keyword">nullable</span> <span class="keyword">id</span>)value forKeyPath:(<span class="built_in">NSString</span> *)keyPath;  <span class="comment">//通过KeyPath来设值</span></span><br></pre></td></tr></table></figure>
+<p>NSKeyValueCoding 类别中的一些其他方法：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">+ (<span class="built_in">BOOL</span>)accessInstanceVariablesDirectly;</span><br><span class="line"><span class="comment">//默认返回YES，表示如果没有找到Set&lt;Key&gt;方法的话，会按照_key，_iskey，key，iskey的顺序搜索成员，设置成NO就不这样搜索</span></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">BOOL</span>)validateValue:(<span class="keyword">inout</span> <span class="keyword">id</span> __<span class="keyword">nullable</span> * __<span class="keyword">nonnull</span>)ioValue forKey:(<span class="built_in">NSString</span> *)inKey error:(<span class="keyword">out</span> <span class="built_in">NSError</span> **)outError;</span><br><span class="line"><span class="comment">//KVC提供属性值正确性验证的API，它可以用来检查set的值是否正确、为不正确的值做一个替换值或者拒绝设置新值并返回错误原因。</span></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSMutableArray</span> *)mutableArrayValueForKey:(<span class="built_in">NSString</span> *)key;</span><br><span class="line"><span class="comment">//这是集合操作的API，里面还有一系列这样的API，如果属性是一个NSMutableArray，那么可以用这个方法来返回。</span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">nullable</span> <span class="keyword">id</span>)valueForUndefinedKey:(<span class="built_in">NSString</span> *)key;</span><br><span class="line"><span class="comment">//如果Key不存在，且没有KVC无法搜索到任何和Key有关的字段或者属性，则会调用这个方法，默认是抛出异常。</span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)setValue:(<span class="keyword">nullable</span> <span class="keyword">id</span>)value forUndefinedKey:(<span class="built_in">NSString</span> *)key;</span><br><span class="line"><span class="comment">//和上一个方法一样，但这个方法是设值。</span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)setNilValueForKey:(<span class="built_in">NSString</span> *)key;</span><br><span class="line"><span class="comment">//如果你在SetValue方法时面给Value传nil，则会调用这个方法</span></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSDictionary</span>&lt;<span class="built_in">NSString</span> *, <span class="keyword">id</span>&gt; *)dictionaryWithValuesForKeys:(<span class="built_in">NSArray</span>&lt;<span class="built_in">NSString</span> *&gt; *)keys;</span><br><span class="line"><span class="comment">//输入一组key,返回该组key对应的Value，再转成字典返回，用于将Model转到字典。</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>
+<p>动态地取值和设值</p>
+</li>
+<li>
+<p>用 KVC 来访问和修改私有变量<br>
+对于类里的私有属性，Objective-C是无法直接访问的，但是KVC是可以的</p>
+</li>
+<li>
+<p>Model 和 字典转换<br>
+其实，常见的第三方 模型解析库就是利用 KVC 和 Objective-C 的 动态性 Runtime 实现的。</p>
+</li>
+<li>
+<p>修改一些控件的内部属性<br>
+利用 KVC 来修改我们无法访问和修改控件的样式，但是 Apple 并没有为我们提供访问这些控件的 API，因此我们不好获取这些属性名。所以，我们又要使用 Runtime 这个东西了。比如，我们可以使用以下代码来获取 UITableView 的属性列表。</p>
+</li>
+</ul>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">unsigned</span> <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line">objc_property_t *propertyList = class_copyPropertyList([<span class="built_in">UITableView</span> <span class="keyword">class</span>], &amp;count);</span><br><span class="line"><span class="built_in">NSMutableArray</span> * mutableList_property = [<span class="built_in">NSMutableArray</span> arrayWithCapacity:count];</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span>  i = <span class="number">0</span>; i &lt; count; i++) &#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *propertyName = property_getName(propertyList[i]);</span><br><span class="line">    [mutableList_property addObject:[<span class="built_in">NSString</span> stringWithUTF8String:propertyName]];</span><br><span class="line">&#125;</span><br><span class="line">free(propertyList);</span><br><span class="line"><span class="built_in">NSArray</span> * propertylist = [<span class="built_in">NSArray</span> arrayWithArray:mutableList_property];</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"\n获取UITableView的属性列表:%@"</span>,propertylist);</span><br><span class="line"><span class="keyword">return</span> <span class="built_in">UIApplicationMain</span>(argc, argv, <span class="literal">nil</span>, <span class="built_in">NSStringFromClass</span>([AppDelegate <span class="keyword">class</span>]));</span><br></pre></td></tr></table></figure>
+<ul>
+<li>操作集合<br>
+苹果 对于 KVC 的 valueForKey: 方法做了特殊的实现。常见的容器类就实现了这些方法。</li>
+<li>实现高阶消息传递<br>
+当对容器使用 KVC 时， valueForKey 会直接呗传递给 容器中的每一个对象，而不只是对容器本身进行操作。结果会被添加进返回的容器。</li>
+</ul>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSArray</span>* arrStr = @[<span class="string">@"english"</span>,<span class="string">@"franch"</span>,<span class="string">@"chinese"</span>];</span><br><span class="line"><span class="built_in">NSArray</span>* arrCapStr = [arrStr valueForKey:<span class="string">@"capitalizedString"</span>];</span><br><span class="line"><span class="keyword">for</span> (<span class="built_in">NSString</span>* str  <span class="keyword">in</span> arrCapStr) &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>,str);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">NSArray</span>* arrCapStrLength = [arrStr valueForKeyPath:<span class="string">@"capitalizedString.length"</span>];</span><br><span class="line"><span class="keyword">for</span> (<span class="built_in">NSNumber</span>* length  <span class="keyword">in</span> arrCapStrLength) &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"%ld"</span>,(<span class="keyword">long</span>)length.integerValue);</span><br><span class="line">&#125;</span><br><span class="line">打印结果</span><br><span class="line"><span class="number">2016</span><span class="number">-04</span><span class="number">-20</span> <span class="number">16</span>:<span class="number">29</span>:<span class="number">14.239</span> KVCDemo[<span class="number">1356</span>:<span class="number">118667</span>] English</span><br><span class="line"><span class="number">2016</span><span class="number">-04</span><span class="number">-20</span> <span class="number">16</span>:<span class="number">29</span>:<span class="number">14.240</span> KVCDemo[<span class="number">1356</span>:<span class="number">118667</span>] Franch</span><br><span class="line"><span class="number">2016</span><span class="number">-04</span><span class="number">-20</span> <span class="number">16</span>:<span class="number">29</span>:<span class="number">14.240</span> KVCDemo[<span class="number">1356</span>:<span class="number">118667</span>] Chinese</span><br><span class="line"><span class="number">2016</span><span class="number">-04</span><span class="number">-20</span> <span class="number">16</span>:<span class="number">29</span>:<span class="number">14.240</span> KVCDemo[<span class="number">1356</span>:<span class="number">118667</span>] <span class="number">7</span></span><br><span class="line"><span class="number">2016</span><span class="number">-04</span><span class="number">-20</span> <span class="number">16</span>:<span class="number">29</span>:<span class="number">14.241</span> KVCDemo[<span class="number">1356</span>:<span class="number">118667</span>] <span class="number">6</span></span><br><span class="line"><span class="number">2016</span><span class="number">-04</span><span class="number">-20</span> <span class="number">16</span>:<span class="number">29</span>:<span class="number">14.241</span> KVCDemo[<span class="number">1356</span>:<span class="number">118667</span>] <span class="number">7</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>用 KVC  中的函数操作集合<br>
+KVC 提供了很复杂的函数：</li>
+</ul>
+<ol>
+<li>简单集合运算符： @avg @count @max @min @sum （不支持自定义）</li>
+<li>对象运算级： @distinctUnionOfObjects @unionOfObjects （比集合运算符稍微复杂，能以数组的方式返回指定的内容）</li>
+<li>Array 和 Set 操作符： @distinctUnionOfArrays @unionOfArrays @distinctUnionOfSets</li>
+</ol>
+<h4><span id="kvo-的使用">KVO 的使用</span></h4>
+<p>对于，KVO 的使用，就是观察键值。在 MVC 设计架构中， KVO 适合 在 Model 和 Controller 之间通讯。<br>
+使用步骤：</p>
+<ol>
+<li>注册观察者，实施监听</li>
+</ol>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//第一个参数observer：观察者 （这里观察self.myKVO对象的属性变化）</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//第二个参数keyPath： 被观察的属性名称(这里观察self.myKVO中num属性值的改变)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//第三个参数options： 观察属性的新值、旧值等的一些配置（枚举值，可以根据需要设置，例如这里可以使用两项）</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//第四个参数context： 上下文，可以为kvo的回调方法传值（例如设定为一个放置数据的字典）</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//注册观察者</span></span><br><span class="line"></span><br><span class="line">[<span class="keyword">self</span>.myKVO addObserver:<span class="keyword">self</span> forKeyPath:<span class="string">@"num"</span> options:<span class="built_in">NSKeyValueObservingOptionOld</span>|<span class="built_in">NSKeyValueObservingOptionNew</span> context:<span class="literal">nil</span>];</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>在回调方法中处理属性发生的变化</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">/keyPath:属性名称</span><br><span class="line"></span><br><span class="line">//object:被观察的对象</span><br><span class="line"></span><br><span class="line">//<span class="keyword">change</span>:变化前后的值都存储在<span class="keyword">change</span>字典中</span><br><span class="line"></span><br><span class="line">//<span class="keyword">context</span>:注册观察者时，<span class="keyword">context</span>传过来的值</span><br><span class="line"></span><br><span class="line">-(<span class="built_in">void</span>)observeValueForKeyPath:(NSString *)keyPath ofObject:(<span class="keyword">id</span>)<span class="keyword">object</span> <span class="keyword">change</span>:(NSDictionary&lt;NSString *,<span class="keyword">id</span>&gt; *)<span class="keyword">change</span> <span class="keyword">context</span>:(<span class="built_in">void</span> *)<span class="keyword">context</span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>移除观察者</li>
+</ol>
+<p><strong>注意：</strong><br>
+观察者观察的是属性，只有遵循 KVO 变更属性值的方式才会执行KVO的回调方法，例如是否执行了setter方法、或者是否使用了KVC赋值。如果赋值没有通过setter方法或者KVC，而是直接修改属性对应的成员变量，例如：仅调用_name = @“newName”，这时是不会触发kvo机制，更加不会调用回调方法的。</p>
+<h3><span id="实现原理">实现原理</span></h3>
+<p>KVO 是 基于 KVC 实现的。首先了解 KVC 的机制，才能更好的理解 KVO。</p>
+<h4><span id="kvc-是如何寻找-key-值的">KVC 是如何寻找 Key 值的</span></h4>
+<ul>
+<li>当调用 <code>setValue: forKey:</code> 时</li>
+</ul>
+<ol>
+<li>优先调用 <code>set &lt;Key&gt;:属性值</code> 方法 ，代码实现 setter 方法</li>
+<li>如果无 set 方法， KVC 会检查  <code>+ (BOOL)accessInstanceVariablesDirectly</code> 有没有返回 YES（默认为 YES，如果重写使其返回 NO 的话，就会执行 <code>setValue：forUndefinedKey：</code>）。KVC 机制会按照<code>_key，_iskey，key，iskey</code>的顺序搜索成员，对其赋值。</li>
+<li>如果都不存在，系统会执行该对象的 <code>setValue：forUndefinedKey：</code>方法，默认抛出异常。</li>
+</ol>
+<ul>
+<li>当调用 <code>valueForKey:</code> 时：<br>
+KVC对key的搜索方式不同于setValue：属性值 forKey：@”name“，其搜索方式如下：</li>
+</ul>
+<ol>
+<li>首先按 <code>get&lt;Key&gt;,&lt;key&gt;,is&lt;Key&gt;</code> 的顺序方法查找 getter 方法，找到的话会直接调用。如果是BOOL或者Int等值类型， 会将其包装成一个NSNumber对象。</li>
+<li>如果上面的 getter 方法未找到，KVC则会查找 <code>countOf&lt;Key&gt; , objectIn&lt;Key&gt;AtIndex</code> 或<code>&lt;Key&gt;AtIndexes</code> 格式的方法。如果 countOf<key> 方法和另外两个方法中的一个被找到，那么就会返回一个可以响应 NSArray 所有方法的代理集合(它是 NSKeyValueArray ，是NSArray的子类)，调用这个代理集合的方法，或者说给这个代理集合发送属于NSArray的方法，就会以countOf<key> ,objectIn<key>AtIndex或<key>AtIndexes这几个方法组合的形式调用。还有一个可选的<code>get&lt;Key&gt;: range:</code> 方法。所以你想重新定义 KVC 的一些功能，你可以添加这些方法，需要注意的是你的方法名要符合KVC的标准命名方法，包括方法签名。</key></key></key></key></li>
+<li>如果上面的方法没有找到，那么会同时查找<code>countOf&lt;Key&gt;，enumeratorOf&lt;Key&gt;,memberOf&lt;Key&gt;</code>格式的方法。如果这三个方法都找到，那么就返回一个可以响应NSSet所的方法的代理集合，和上面一样，给这个代理集合发NSSet的消息，就会以countOf<key>，enumeratorOf<key>,memberOf<key>组合的形式调用。</key></key></key></li>
+<li>如果还未找到，则和先前的设值一样，会按<code>_&lt;key&gt;,_is&lt;Key&gt;,&lt;key&gt;,is&lt;Key&gt;</code>的顺序搜索成员变量名，这里不推荐这么做，因为这样直接访问实例变量破坏了封装性，使代码更脆弱。如果重写了类方法 <code>+ (BOOL)accessInstanceVariablesDirectly</code>返回NO的话，那么会直接调用<code>valueForUndefinedKey:</code></li>
+<li>还没有找到的话，调用<code>valueForUndefinedKey:</code></li>
+</ol>
+<ul>
+<li>
+<p>在 KVC 中 使用 keyPath<br>
+用小数点分割 key,，然后再像普通key一样按照先前介绍的顺序搜索下去。如果属性不存在，同样会调用 <code>valueForUndefinedKey:</code></p>
+</li>
+<li>
+<p>KVC处理异常<br>
+重写抛出异常的那两个方法，通常情况下，KVC不允许你要在调用setValue：属性值 forKey：@”name“(或者keyPath)时对非对象传递一个nil的值。</p>
+</li>
+<li>
+<p>KVC 处理非对象和自定义对象<br>
+<code>valueForKey：</code>总是返回一个id对象，如果原本的变量类型是值类型或者结构体，返回值会封装成NSNumber或者NSValue对象，但是 <code>setValue：forKey：</code>却不行。你必须手动将值类型转换成NSNumber或者NSValue类型，才能传递过去。</p>
+</li>
+<li>
+<p>KVC与容器类<br>
+不可变的有序容器属性（NSArray）和无序容器属性（NSSet）一般可以使用 <code>valueForKey：</code>来获取。如有一个叫 items 的 NSArray 的属性，你可以使用 <code>valuleaForKey:@&quot;items&quot;</code> 来获取这个属性。<br>
+当对象的属性是可变的容器时，对于有序容器，可以使用如下方法：<br>
+<code>- (NSMutableArray *)mutableArrayValueForKey:(NSString *)key;</code><br>
+该方法的返回值是一个可变的有序数组，如果调用该方法，KVC 的搜索顺序如下：</p>
+<ol>
+<li>搜索 <code>insertObject: in&lt;Key&gt;AtIndex:</code> , <code>removeObjectFrom&lt;Key&gt;AtIndex:</code> 或者 <code>insert&lt;Key&gt;AtIndexes</code>，<code>remove&lt;Key&gt;AtIndexes</code> 格式的方法。如果至少找到一个 insert 方法和一个 remove 方法，那么同样返回一个可以响应 NSMutableArray 所有方法代理集合(类名是 NSKeyValueFastMutableArray2 )，那么给这个代理集合发送NSMutableArray 的方法，就会以 <code>insertObject:in&lt;Key&gt;AtIndex:</code> , <code>removeObjectFrom&lt;Key&gt;AtIndex:</code> 或者 <code>insert&lt;Key&gt;AdIndexes</code> , <code>remove&lt;Key&gt;AtIndexes</code>组合的形式调用。还有两个可选实现的接口：<code>replaceOnjectAtIndex:withObject:</code>,<code>replace&lt;Key&gt;AtIndexes:with&lt;Key&gt;:</code>。</li>
+<li>如果上步的方法没有找到，则搜索<code>set&lt;Key&gt;:</code> 格式的方法，如果找到，那么发送给代理集合的 NSMutableArray 最终都会调用<code>set&lt;Key&gt;:</code>方法。 也就是说，<code>mutableArrayValueForKey:</code>取出的代理集合修改后，用<code>set&lt;Key&gt;:</code> 重新赋值回去去。这样做效率会低很多。所以推荐实现上面的方法。</li>
+<li>如果上一步的方法还还没有找到，再检查类方法<code>+ (BOOL)accessInstanceVariablesDirectly</code>,如果返回 YES (默认行为)，会按 <code>_&lt;key&gt;,&lt;key&gt;</code>,的顺序搜索成员变量名，如果找到，那么发送的 NSMutableArray 消息方法直接交给这个成员变量处理。</li>
+<li>如果还未找到，则调用 <code>valueForUndefinedKey:</code>，默认抛出异常 。</li>
+</ol>
+</li>
+</ul>
+<p>除了用于有序的可变容器外，<code>mutableArrayValueForKey:</code>一般还用于对 NSMutableArray 添加 Observer 上。如果对象属性是个 可变容器类型时，你给他添加 KVO时，你会发现当你添加或移除元素时并不会接受到变化。因为 KVO 的本质是系统监测到某个属性的内存地址或者常量改变时，会添加上<code>- (void)willChangeValueForKey:(NSString *)key</code>和<code>- (void)didChangeValueForKey:(NSString *)key</code>方法来发送通知，所以一种方法是手动调用这两个方法，一种是使用上述的  <code>mutableArrayValueForKey:</code> 方法。<br>
+对于无序容器时，可以使用下面的方法：<br>
+<code>- (NSMutableSet *)mutableSetValueForKey:(NSString *)key;</code><br>
+该方法返回一个可变的无序数组，如果调用该方法，KVC 的搜索顺序除了检查 receiver 是 ManagedObject 以外，其搜索顺序和 <code>mutableArrayValueForKey</code> 基本一致。</p>
+<ul>
+<li>KVC与字典<br>
+当对NSDictionary对象使用KVC时，valueForKey:的表现行为和objectForKey:一样。所以使用valueForKeyPath:用来访问多层嵌套的字典是比较方便的。</li>
+</ul>
+<h4><span id="kvo-的原理">KVO 的原理</span></h4>
+<p>我们之前就说了 KVO 的实现依靠的是 Objective-C 强大的 Runtime。那么具体的，我们是如何实现这一机制的呢？下面让我们共同来探讨一下。</p>
+<p><strong>基本原理：</strong><br>
+当观察对象 A 时， KVO 机制动态的创建了一个对象 A 当前的子类，并为这个新的子类重写了被观察属性 keyPath 的 setter 方法。在 setter 方法中，我们通知观察对象属性的改变状态。</p>
+<p><strong>进一步剖析：</strong><br>
+其实 Apple 使用了 isa 混写，即 isa-swizzling 来实现 KVO。</p>
+<blockquote>
+<p>Automatic key-value observing is implemented using a technique called isa-swizzling.<br>
+The isa pointer, as the name suggests, points to the object’s class which maintains a dispatch table. This dispatch table essentially contains pointers to the methods the class implements, among other data.</p>
+</blockquote>
+<blockquote>
+<p>When an observer is registered for an attribute of an object the isa pointer of the observed object is modified, pointing to an intermediate class rather than at the true class. As a result the value of the isa pointer does not necessarily reflect the actual class of the instance.</p>
+</blockquote>
+<blockquote>
+<p>You should never rely on the isa pointer to determine class membership. Instead, you should use the class method to determine the class of an object instance.</p>
+</blockquote>
+<p>那么，我们通过下面的代码来看看，isa-swizzling 的真面目到底是什么？</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在 PQCPeople.m 中,我们模拟 KVO 的过程，打印 isa 指针指向的类，以及 setter 方法的的函数指针</span></span><br><span class="line"><span class="selector-tag">-</span> (void)<span class="selector-tag">printUserInfo</span> &#123;</span><br><span class="line">    <span class="selector-tag">NSLog</span>(@<span class="string">"isa:%@,supperclass:%@"</span>,NSStringFromClass(object_getClass(self)),</span><br><span class="line">          class_getSuperclass(object_getClass(self)));</span><br><span class="line">    <span class="selector-tag">NSLog</span>(@<span class="string">"self:%@, [self superclass]:%@"</span>, self, [self superclass]);</span><br><span class="line">    <span class="selector-tag">NSLog</span>(@<span class="string">"name setter function pointer:%p"</span>, class_getMethodImplementation(object_getClass(self), <span class="variable">@selector</span>(<span class="attribute">setNamestr</span>:)));</span><br><span class="line">    <span class="selector-tag">NSLog</span>(@<span class="string">"printInfo function pointer:%p"</span>, class_getMethodImplementation(object_getClass(self), <span class="variable">@selector</span>(printUserInfo)));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在运行过程中，在添加Observer前，添加Observer以及删除Observer后分别打印出该类的信息。</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">PQCPeople *person = [[PQCPeople alloc]init]<span class="comment">;</span></span><br><span class="line">NSLog(@<span class="string">"Before add observer————————————————————————–"</span>)<span class="comment">;</span></span><br><span class="line">[person printUserInfo]<span class="comment">;</span></span><br><span class="line">[person <span class="keyword">addObserver:self </span>forKeyPath:@<span class="string">"namestr"</span> options:NSKeyValueObservingOptionNew <span class="built_in">context</span>:nil]<span class="comment">;</span></span><br><span class="line">NSLog(@<span class="string">"After add observer————————————————————————–"</span>)<span class="comment">;</span></span><br><span class="line">[person printUserInfo]<span class="comment">;</span></span><br><span class="line">[person removeObserver:self forKeyPath:@<span class="string">"namestr"</span>]<span class="comment">;</span></span><br><span class="line">NSLog(@<span class="string">"After remove observer————————————————————————–"</span>)<span class="comment">;</span></span><br><span class="line">[person printUserInfo]<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p>以下是打印的信息：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">2017<span class="selector-tag">-11-14</span> 13<span class="selector-pseudo">:06</span><span class="selector-pseudo">:51.927605+0800</span> <span class="selector-tag">KVC</span>&amp;<span class="selector-tag">KVO</span><span class="selector-attr">[851:92433]</span> <span class="selector-tag">Before</span> <span class="selector-tag">add</span> <span class="selector-tag">observer</span>————————————————————————–</span><br><span class="line">2017<span class="selector-tag">-11-14</span> 13<span class="selector-pseudo">:06</span><span class="selector-pseudo">:51.927701+0800</span> <span class="selector-tag">KVC</span>&amp;<span class="selector-tag">KVO</span><span class="selector-attr">[851:92433]</span> <span class="selector-tag">isa</span><span class="selector-pseudo">:PQCPeople</span>,<span class="selector-tag">supperclass</span><span class="selector-pseudo">:NSObject</span></span><br><span class="line">2017<span class="selector-tag">-11-14</span> 13<span class="selector-pseudo">:06</span><span class="selector-pseudo">:51.927814+0800</span> <span class="selector-tag">KVC</span>&amp;<span class="selector-tag">KVO</span><span class="selector-attr">[851:92433]</span> <span class="selector-tag">self</span>:&lt;<span class="selector-tag">PQCPeople</span>: 0<span class="selector-tag">x604000059c50</span>&gt;, <span class="selector-attr">[self superclass]</span><span class="selector-pseudo">:NSObject</span></span><br><span class="line">2017<span class="selector-tag">-11-14</span> 13<span class="selector-pseudo">:06</span><span class="selector-pseudo">:51.927904+0800</span> <span class="selector-tag">KVC</span>&amp;<span class="selector-tag">KVO</span><span class="selector-attr">[851:92433]</span> <span class="selector-tag">name</span> <span class="selector-tag">setter</span> <span class="selector-tag">function</span> <span class="selector-tag">pointer</span><span class="selector-pseudo">:0x10c2429d0</span></span><br><span class="line">2017<span class="selector-tag">-11-14</span> 13<span class="selector-pseudo">:06</span><span class="selector-pseudo">:51.927987+0800</span> <span class="selector-tag">KVC</span>&amp;<span class="selector-tag">KVO</span><span class="selector-attr">[851:92433]</span> <span class="selector-tag">printInfo</span> <span class="selector-tag">function</span> <span class="selector-tag">pointer</span><span class="selector-pseudo">:0x10c242ba0</span></span><br><span class="line">2017<span class="selector-tag">-11-14</span> 13<span class="selector-pseudo">:06</span><span class="selector-pseudo">:51.928224+0800</span> <span class="selector-tag">KVC</span>&amp;<span class="selector-tag">KVO</span><span class="selector-attr">[851:92433]</span> <span class="selector-tag">After</span> <span class="selector-tag">add</span> <span class="selector-tag">observer</span>————————————————————————–</span><br><span class="line">2017<span class="selector-tag">-11-14</span> 13<span class="selector-pseudo">:06</span><span class="selector-pseudo">:51.928316+0800</span> <span class="selector-tag">KVC</span>&amp;<span class="selector-tag">KVO</span><span class="selector-attr">[851:92433]</span> <span class="selector-tag">isa</span><span class="selector-pseudo">:NSKVONotifying_PQCPeople</span>,<span class="selector-tag">supperclass</span><span class="selector-pseudo">:PQCPeople</span></span><br><span class="line">2017<span class="selector-tag">-11-14</span> 13<span class="selector-pseudo">:06</span><span class="selector-pseudo">:51.928489+0800</span> <span class="selector-tag">KVC</span>&amp;<span class="selector-tag">KVO</span><span class="selector-attr">[851:92433]</span> <span class="selector-tag">self</span>:&lt;<span class="selector-tag">PQCPeople</span>: 0<span class="selector-tag">x604000059c50</span>&gt;, <span class="selector-attr">[self superclass]</span><span class="selector-pseudo">:NSObject</span></span><br><span class="line">2017<span class="selector-tag">-11-14</span> 13<span class="selector-pseudo">:06</span><span class="selector-pseudo">:51.928628+0800</span> <span class="selector-tag">KVC</span>&amp;<span class="selector-tag">KVO</span><span class="selector-attr">[851:92433]</span> <span class="selector-tag">name</span> <span class="selector-tag">setter</span> <span class="selector-tag">function</span> <span class="selector-tag">pointer</span><span class="selector-pseudo">:0x10c58f666</span></span><br><span class="line">2017<span class="selector-tag">-11-14</span> 13<span class="selector-pseudo">:06</span><span class="selector-pseudo">:51.928798+0800</span> <span class="selector-tag">KVC</span>&amp;<span class="selector-tag">KVO</span><span class="selector-attr">[851:92433]</span> <span class="selector-tag">printInfo</span> <span class="selector-tag">function</span> <span class="selector-tag">pointer</span><span class="selector-pseudo">:0x10c242ba0</span></span><br><span class="line">2017<span class="selector-tag">-11-14</span> 13<span class="selector-pseudo">:06</span><span class="selector-pseudo">:51.928954+0800</span> <span class="selector-tag">KVC</span>&amp;<span class="selector-tag">KVO</span><span class="selector-attr">[851:92433]</span> <span class="selector-tag">After</span> <span class="selector-tag">remove</span> <span class="selector-tag">observer</span>————————————————————————–</span><br><span class="line">2017<span class="selector-tag">-11-14</span> 13<span class="selector-pseudo">:06</span><span class="selector-pseudo">:51.929077+0800</span> <span class="selector-tag">KVC</span>&amp;<span class="selector-tag">KVO</span><span class="selector-attr">[851:92433]</span> <span class="selector-tag">isa</span><span class="selector-pseudo">:PQCPeople</span>,<span class="selector-tag">supperclass</span><span class="selector-pseudo">:NSObject</span></span><br><span class="line">2017<span class="selector-tag">-11-14</span> 13<span class="selector-pseudo">:06</span><span class="selector-pseudo">:51.929268+0800</span> <span class="selector-tag">KVC</span>&amp;<span class="selector-tag">KVO</span><span class="selector-attr">[851:92433]</span> <span class="selector-tag">self</span>:&lt;<span class="selector-tag">PQCPeople</span>: 0<span class="selector-tag">x604000059c50</span>&gt;, <span class="selector-attr">[self superclass]</span><span class="selector-pseudo">:NSObject</span></span><br><span class="line">2017<span class="selector-tag">-11-14</span> 13<span class="selector-pseudo">:06</span><span class="selector-pseudo">:51.929431+0800</span> <span class="selector-tag">KVC</span>&amp;<span class="selector-tag">KVO</span><span class="selector-attr">[851:92433]</span> <span class="selector-tag">name</span> <span class="selector-tag">setter</span> <span class="selector-tag">function</span> <span class="selector-tag">pointer</span><span class="selector-pseudo">:0x10c2429d0</span></span><br><span class="line">2017<span class="selector-tag">-11-14</span> 13<span class="selector-pseudo">:06</span><span class="selector-pseudo">:51.929586+0800</span> <span class="selector-tag">KVC</span>&amp;<span class="selector-tag">KVO</span><span class="selector-attr">[851:92433]</span> <span class="selector-tag">printInfo</span> <span class="selector-tag">function</span> <span class="selector-tag">pointer</span><span class="selector-pseudo">:0x10c242ba0</span></span><br></pre></td></tr></table></figure>
+<p>通过分析，我们会发现在添加KVO之后，isa 已经替换成了<code>NSKVONotifying_PQCPeople</code>,而根据 <code>class_getSuperclass</code>得到的结果竟然是 PQCPerson, 然后 namestr 是我们KVO需要观察的属性，它的 <code>setter</code>函数指针也变了。<br>
+我们上面也说道， OC 的消息机制是通过 isa 去查找实现的，那么我们可以根据以上的分析，可以大致得出，KVO的实现应该是：</p>
+<ul>
+<li>
+<p>添加 Observe<br>
+通过 runtime 偷偷实现了一个子类，并且以 NSKVONotifying_+类名 来命名；<br>
+将之前那个对象的isa指针指向了这个子类；<br>
+重写了观察的对象setter方法，并且在重写的中添加了<code>willChangeValueForKey:</code>以及<code>didChangeValueForKey:</code></p>
+</li>
+<li>
+<p>移除 Observe<br>
+将 isa 的指向指回原来的类对象中。</p>
+</li>
+</ul>
+<p>因此，我们的 KVO 就是通过上述分析的这种机制，进行键值观察。<br>
+<img src="http://upload-images.jianshu.io/upload_images/2726320-fa39c5bab1cdf221.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="isa_swizzling.jpg"></p>
+<h3><span id="文末">文末</span></h3>
+<p>通过上面的分析，我们也大概了解了 KVC 以及 KVO 的实现过程以及实现原理，对这个感兴趣的同学，我们可以试着去自己实现一下 KVC 以及 KVO。</p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                        <li class="next">
+                            <a href="/2018/03/04/初探-iOS-内存管理/" data-toggle="tooltip" data-placement="top" title="初探 iOS 内存管理">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">概念</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">KVC /  KVO 的使用</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">KVC的使用</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">KVO 的使用</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">实现原理</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">KVC 是如何寻找 Key 值的</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">KVO 的原理</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">文末</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="http://beantech.org" target="_blank">Bean Tech</a></li>
+                    
+                        <li><a href="http://blog.kaijun.rocks" target="_blank">Kaijun&#39;s Blog</a></li>
+                    
+                        <li><a href="http://huangxuan.me" target="_blank">Hux Blog</a></li>
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "https://puqin2333.github.io/2018/03/05/“KVC-KVO的使用以及实现原理”/";
+    var disqus_url = "https://puqin2333.github.io/2018/03/05/“KVC-KVO的使用以及实现原理”/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/puqin.chen">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="http://weibo.com/5720008246">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/puqin2333">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; Puqin Chen 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://beantech.org">BeanTech</a> | 
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://puqin2333.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="https://puqin2333.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
