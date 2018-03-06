@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          我有路，正在走 - 普帅同学的博客|puqin’s blog
+          Mac下GitHub的使用 - 普帅同学的博客|puqin’s blog
         
     </title>
 
-    <link rel="canonical" href="https://puqin2333.github.io/2018/01/24/我有路，正在走/">
+    <link rel="canonical" href="https://puqin2333.github.io/2018/02/04/Mac下GitHub的使用/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -90,14 +90,14 @@
                     <div class="post-heading">
                         <div class="tags">
                             
-                              <a class="tag" href="/tags/#生活" title="生活">生活</a>
+                              <a class="tag" href="/tags/#工具" title="工具">工具</a>
                             
                         </div>
-                        <h1>我有路，正在走</h1>
+                        <h1>Mac下GitHub的使用</h1>
                         <h2 class="subheading"></h2>
                         <span class="meta">
                             Posted by Puqin Chen on
-                            2018-01-24
+                            2018-02-04
                         </span>
                     </div>
                 
@@ -214,8 +214,56 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <h2><span id="我是谁">我是谁</span></h2>
-<p>还记得第一次提出“我是谁，我从哪来，我要去哪？”这一问题的是我的高中班主任。他将此作为高三第一次班会主题，让我们思考交流。</p>
+                <h2><span id="mac-下-github-的使用">Mac 下  GitHub 的使用</span></h2>
+<p>[TOC]</p>
+<p>本文主要是讲讲Mac 环境下 GitHub 的前期配置和 用 git 命令上传你的本地项目</p>
+<h3><span id="准备工作">准备工作</span></h3>
+<ul>
+<li>下载 最新版的 git ,</li>
+<li>自己创建一个 GitHub 账号</li>
+</ul>
+<h3><span id="github-环境配置">GitHub 环境配置</span></h3>
+<h4><span id="安装-git">安装 git</span></h4>
+<ol>
+<li>在mac的终端上，输入git会提示安装git软件，确认安装。安装完成后打开终端，使用git --version或者which git命令查看安装版本，有就是安装成功了。（一般，直接先输入 git --version 看，如果返回版本，则证明成功）</li>
+<li>创建一个全局用户名、全局邮箱作为配置信息。<br>
+<em>在终端运行如下命令：</em></li>
+</ol>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">   git<span class="built_in"> config </span>--global user.name <span class="string">"***"</span></span><br><span class="line">git<span class="built_in"> config </span>--global user.email <span class="string">"***@example.com"</span></span><br></pre></td></tr></table></figure>
+<p><em>其中，第一个是你 GitHub 账号用户名，第二个是你注册邮箱</em></p>
+<h4><span id="配置-ssh">配置 SSH</span></h4>
+<p>由于本地 Git 仓库和 GitHub 仓库之间的传输是通过 SSH 加密的，所以要在本地生成一个私钥和一个密钥。<br>
+下面来完成 创建 ssh 的步骤：</p>
+<ol>
+<li>在终端输入如下命令：</li>
+</ol>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">defaults write com<span class="selector-class">.apple</span><span class="selector-class">.finder</span> AppleShowAllFiles Yes &amp;&amp; killall Finder</span><br></pre></td></tr></table></figure>
+<p>来显示隐藏文件。</p>
+<ol start="2">
+<li>点击桌面顶部菜单 前往&gt;个人 看看自己电脑上有没有个 .ssh 的隐藏文件，有的话个人建议删除，然后在终端输入：<code>mkdir .ssh</code>，新建一个 .ssh 文件</li>
+<li>进入到刚才新建的 .ssh 文件目录下<code>cd .ssh</code></li>
+<li>然后继续在终端输入 ： <code>ssh-Keygen -t rsa -C &quot;your_email@example.com&quot;</code></li>
+<li>然后后面几步，你一直按回车就可以，直到出现类似下方图片这样的内容<br>
+<img src="http://img.blog.csdn.net/20170610164852157?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaV9hbV93aGF0X2lfYW0=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></li>
+<li>然后输入 <code>ls -la</code> 查看是否存在 id_rsa(私钥)  id_rsa.pub(公钥) 这两个东西，如果存在就成功了</li>
+<li>在终端输入如下命令，拷贝公钥 <code>pbcopy &lt; ~/.ssh/id_rsa.pub</code></li>
+<li>在浏览器上，登录你的 GitHub，进去后点击你的头像，选择 Settings，点击SSH and GPG keys ，如下图这样的页面<br>
+<img src="http://img.blog.csdn.net/20170610165009145?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaV9hbV93aGF0X2lfYW0=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"><br>
+Title：输入你的邮箱就好<br>
+Key：是你之前复制的公钥，这里直接 command + v 就可以了。<br>
+最后点击 Add SSH Key 就好。</li>
+</ol>
+<p>你会发现，你新添加的 SSH 是灰的，然后在终端输入 <code>ssh -T git@github.com</code> 这个命令，刷新页面，灰色就变成了绿色，证明你的 ssh 就算配置成功了。</p>
+<h3><span id="上传本地项目">上传本地项目</span></h3>
+<ol>
+<li>在GitHub首页上，点击 “Create a New Repository”（为了便于后面演示，创建README.md这步暂不勾选），创建一个版本库 。</li>
+<li>然后通过终端，进行本地仓库的创建及代码上传，先在 终端 <em>cd 到你的项目文件</em></li>
+<li>依次执行如下步骤</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> touch README.md                 //新建一个README文档  </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git init                        //初始化本地仓库  </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git add README.md               //添加刚刚创建的README文档  </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git commit -m “注释<span class="string">"            //提交到本地仓库，并写一些注释  </span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git remote add origin git@github.com:yourname/xxxx.git  //连接远程仓库并建了一个名叫：origin的别名，youname记得替换成你的用户名，XXXX为你的版本库的名字 </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git push -u origin master      //将本地仓库的文件提交到别名为origin的地址的master分支下，-u为第一次提交，需要创建master分支，下次就不需要了</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git add XXX                                     // xxx为你的项目名字，添加需要提交的文件夹(可以直接将你的项目文件拖到终端里)</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git commit -m <span class="string">"上传项目源代码"</span>                         // 提交到本地仓库  </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git push origin master                               // 将本地仓库合并到别名为origin地址的master分支下</span></span><br></pre></td></tr></table></figure>
+<p>刷新一下GitHub,则会显示刚刚提交的项目源代码。</p>
+<h3><span id="总结">总结</span></h3>
+<p>以上就是我总结的将项目上传到 GitHub 的全过程。大家有什么问题，或者不懂的，可以在底下评论或者联系我。</p>
 
                 
 
@@ -224,9 +272,13 @@
                 <ul class="pager">
                     
                         <li class="previous">
-                            <a href="/2018/02/04/Mac下GitHub的使用/" data-toggle="tooltip" data-placement="top" title="Mac下GitHub的使用">&larr; Previous Post</a>
+                            <a href="/2018/03/04/初探-iOS-内存管理/" data-toggle="tooltip" data-placement="top" title="初探 iOS 内存管理">&larr; Previous Post</a>
                         </li>
                     
+                    
+                        <li class="next">
+                            <a href="/2018/01/24/我有路，正在走/" data-toggle="tooltip" data-placement="top" title="我有路，正在走">Next Post &rarr;</a>
+                        </li>
                     
                 </ul>
 
@@ -255,7 +307,7 @@
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">我是谁</span></a></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">Mac 下  GitHub 的使用</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">准备工作</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">GitHub 环境配置</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.1.</span> <span class="toc-nav-text">安装 git</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.2.</span> <span class="toc-nav-text">配置 SSH</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.3.</span> <span class="toc-nav-text">上传本地项目</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.4.</span> <span class="toc-nav-text">总结</span></a></li></ol></li></ol>
         
         </div>
       </aside>
@@ -275,7 +327,7 @@
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
-                          <a class="tag" href="/tags/#生活" title="生活">生活</a>
+                          <a class="tag" href="/tags/#工具" title="工具">工具</a>
                         
                     </div>
                 </section>
@@ -310,8 +362,8 @@
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES * * */
     var disqus_shortname = "your-disqus-ID";
-    var disqus_identifier = "https://puqin2333.github.io/2018/01/24/我有路，正在走/";
-    var disqus_url = "https://puqin2333.github.io/2018/01/24/我有路，正在走/";
+    var disqus_identifier = "https://puqin2333.github.io/2018/02/04/Mac下GitHub的使用/";
+    var disqus_url = "https://puqin2333.github.io/2018/02/04/Mac下GitHub的使用/";
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

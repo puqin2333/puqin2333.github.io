@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          我有路，正在走 - 普帅同学的博客|puqin’s blog
+          TCP/IP 协议学习笔记 - 普帅同学的博客|puqin’s blog
         
     </title>
 
-    <link rel="canonical" href="https://puqin2333.github.io/2018/01/24/我有路，正在走/">
+    <link rel="canonical" href="https://puqin2333.github.io/2018/03/06/TCP-IP-协议学习笔记/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -90,14 +90,14 @@
                     <div class="post-heading">
                         <div class="tags">
                             
-                              <a class="tag" href="/tags/#生活" title="生活">生活</a>
+                              <a class="tag" href="/tags/#计算机网络" title="计算机网络">计算机网络</a>
                             
                         </div>
-                        <h1>我有路，正在走</h1>
+                        <h1>TCP/IP 协议学习笔记</h1>
                         <h2 class="subheading"></h2>
                         <span class="meta">
                             Posted by Puqin Chen on
-                            2018-01-24
+                            2018-03-06
                         </span>
                     </div>
                 
@@ -214,8 +214,114 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <h2><span id="我是谁">我是谁</span></h2>
-<p>还记得第一次提出“我是谁，我从哪来，我要去哪？”这一问题的是我的高中班主任。他将此作为高三第一次班会主题，让我们思考交流。</p>
+                <blockquote>
+<p>一般来说，TCP/IP 是利用IP进行通信时所必须用到的协议群的统称。具体点，IP或ICMP、TCP或UDP、TELENT或ETP、以及HTTP等都属于TCP/IP协议，而TCP/IP泛指这些协议。</p>
+</blockquote>
+<h2><span id="tcpip协议分层模型">TCP/IP协议分层模型</span></h2>
+<p>网络协议通常分为不同层次进行开发，每一层分别负责不同的通信功能。一个协议族，比如TCP/IP，是一组不同层次上的多个协议的组合。TCP/IP通常被认为是一个四层协议系统，如下表所示：</p>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>对应的协议或应用</th>
+<th>负责的功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>应用层</td>
+<td>Telnet、FTP和e-mail等</td>
+<td>负责处理特定的应用程序细节</td>
+</tr>
+<tr>
+<td>运输层</td>
+<td>TCP 和 UDP</td>
+<td>为两台主机上的应用程序提供端到端的通信</td>
+</tr>
+<tr>
+<td>网络层</td>
+<td>IP、ICMP 和 IGMP</td>
+<td>处理分组在网络中的活动，例如分组的选路</td>
+</tr>
+<tr>
+<td>链路层</td>
+<td>设备驱动程序及接口层</td>
+<td>处理与传输媒介的物理接口细节</td>
+</tr>
+</tbody>
+</table>
+<p>通常情况下，应用程序就是一个用户进程，而下三层则一般在（操作系统）内核中执行，例如 UNIX 操作系统。除此之外，应用层与下三层还有一个关键不同在于：应用层关心的是应用程序的细节，而不是数据在网络中的传输活动，下三层对应用程序一无所知，但它们要处理所有的通信细节。</p>
+<p>在TCP/IP协议族中，网络层IP提供的是一种不可靠的服务，也就是说，它只是尽快的将分组从源结点送到目的结点，但并不提供任何可靠性保证。而另一方面，TCP在不可靠的IP层上提供了一个可靠的运输层。为了提供这种可靠的服务，TCP采用了超时重传、发送和接收端到端的确认分组等机制。由此可见，运输层和网络层分别负责不同的功能。</p>
+<h2><span id="tcpip-的分层">TCP/IP 的分层</span></h2>
+<p>在 TCP/IP 协议族中，有很多中协议。如下图所示：<br>
+在 TCP/IP 协议族中，有很多中协议。如下图所示：<br>
+<img src="http://upload-images.jianshu.io/upload_images/2726320-7e67c726117f2f52.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="TCP/IP协议族中不同层次的协议"><br>
+TCP 和 UDP 是两种最为著名的运输层协议，二者都可以使用 IP 作为网络层协议。虽然 TCP 使用不可靠的 IP 服务，但它却提供了一种可靠的运输层服务；UDP 为应用程序发送和接收数据报。一个数据报是指从发送方传输到接收方的一个信息单元。但是与 TCP 不同的是，UDP 是不可靠的的，它不能保证数据报能够安全无误地到达最终目的。</p>
+<p>IP 是网络层上的主要协议，同时被 TCP 和 UDP 使用。TCP 和 UDP 的每组数据都通过端系统和每个中间路由器中的IP层在互联网中进行传输。ICMP是IP协议的附属协议，IP层用它来与其他主机或路由器交换错误报文和其他重要信息。Ping 和 Traceroute，它们都使用了 ICMP。IGMP 是 Internet 组管理协议，它用来把一个 UDP 数据报多播到多个主机。</p>
+<p>ARP（地址解析协议）和 RARP（逆地址解析协议）是某些网络接口使用的特殊协议，用来转换IP层和网络接口层使用的地址。</p>
+<p>当应用程序用TCP传送数据时，数据被送入协议栈中，然后逐个通过每一层直到被当作一串比特流送入网络，其中每一层对收到的数据都要增加一些首部信息（有时还要加一些尾部信息）。TCP 传给IP的数据单元称作TCP报文段或简称为 TCP 段。IP传给网络接口层的数据单元称作IP数据报。通过以太网传输的比特流称为帧。 UDP 数据与 TCP 数据基本一致。唯一不同的是 UDP 传给IP的信息单元称为 UDP 数据报，而且 UDP 的首部长为8字节。</p>
+<h3><span id="ip网际协议">IP：网际协议</span></h3>
+<blockquote>
+<p>IP 是TCP/IP协议族中最为核心的协议。所有的TCP、UDP、ICMP及IGMP数据都以IP数据报格式传输，它提供不可靠、无连接的数据报传送服务。</p>
+</blockquote>
+<p>不可靠的意思是指它不能保证IP数据报能够成功地到达目的地。IP仅提供最基本的传输服务。如果发生某种错误时，如某个路由器暂时用完了缓冲区，IP有一个简单的错误处理算法：丢弃该数据报，然后发送ICMP消息报给信源端。</p>
+<p>无连接是指IP并不维护任何关于后续数据报的状态信息。每个数据报的处理是相互独立的。这也说明，IP数据报可以不按发送顺序接收。</p>
+<h4><span id="ip首部">IP首部</span></h4>
+<p>IP 数据报的格式，如图所示：<br>
+<img src="http://upload-images.jianshu.io/upload_images/2726320-a448fba6865845bf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="IP首部.png"></p>
+<p><strong>版本号</strong>：版本号字段占4位： IP协议的版本号，一般有两个值，如果为4就代表是IPv4，6就代表是IPv6协议。 4→IPv4， 6 → IPv6</p>
+<p><strong>首部长度</strong>：指首部占32位字的数目。普通IP数据报（没有任何选择项）字段的值是5。</p>
+<p><strong>服务类型（TOS）字段</strong>：包括一个3bit的优先权子字段，4bit的TOS子字段和1bit未用位但必须置0。4 bit的TOS分别代表：最小时延、最大吞吐量、最高可靠性和最小费用。4bit中只能置其中1bit。</p>
+<p><strong>总长度字段</strong>：指整个IP数据报的长度，以字节为单位。利用首部长度字段和总长度字段就可以知道IP数据报中数据内容的起始位置和长度。总长度字段是IP首部中必要的内容。<br>
+<strong>标识字段</strong>：唯一的标识主机发送的每一份数据报。通常每发送一份报文它的值就加1。</p>
+<p><strong>TTL</strong>：生存时间字段设置了数据报可以经过的最多路由器数。</p>
+<p><strong>首部检验和字段</strong>：根据IP首部计算的检验和码。它不对首部后面的数据进行计算。ICMP、IGMP、UDP、TCP在它们各自的首部中均含有同时覆盖首部和数据检验和码。</p>
+<blockquote>
+<p>如何计算一份数据报的IP检验和：1.检验和字段置为0； 2.对首部的每个16bit进行二进制反码求和并存入检验和字段中。 3. 接收方对收到的IP首部划分为若干个16bit,并进行反码求和，如果接收方计算结果全为1，则无错。</p>
+</blockquote>
+<h4><span id="ip路由选择">IP路由选择</span></h4>
+<p>主机的路由选择可以非常简单：如果目的主机在直接连接的网络上，那么就把数据报直接传给目的主机，否则传给默认路由器。</p>
+<p>在进行路由选择决策时，主机和路由器都使用路由表。在表中，有三种类型的路由：特定主机型、特定网络型和默认路由型。路由表在表目具有一定的优先级。在选择路由时，主机路由优先于网络路由，最后在没有其他可选路由存在时才选择默认路由。</p>
+<p>IP路由选择是通过逐跳来实现的。数据报在各站的传输过程中目的IP地址始终不变，但是封装和目的链路层地址在每一站都可以改变。</p>
+<h3><span id="运输层协议tcp-和-udp">运输层协议：TCP 和 UDP</span></h3>
+<blockquote>
+<p>运输层介于应用层和网络层之间，将主机到主机的端对端通信能力扩展为进程到进程的端到端通信能力。它运行在位于英特网边缘的端系统上，对上直接为不同的应用程序进程提供可靠的或尽力而为的通信服务，对下则有效地利用网络层的IP尽力而为服务。运输层是TCP/IP 分层网络体系结构中承上启下的重要环节。</p>
+</blockquote>
+<h4><span id="多路复用与多路分解">多路复用与多路分解</span></h4>
+<p>网络层的传输通道只有一个，但是应用进程之间的交互关系却很多，因此运输层担负着将多个应用进程的报文通过同一个网络层传递通道进行传输，并正确地交给某个应用进程的任务，称为运输层的多路复用与多路分解。</p>
+<p><strong>套接字和端口</strong></p>
+<p>端口和套接字的作用：为了表示主机中存在多个进程，我们用端口号标识这台主机中的进程，用IP地址标识这台主机；端口连同标识主机接口的IP地址一起，能够唯一标识网络中的任何进程（TCP 和 UDP 的端口号各自独立）；为了简化编程操作，我们引入套接字（Socket）来描述网络两端进程之间的通信链（通信链表示通信双方IP地址、端口号及运输层协议之间的关联）。<br>
+当接收主机收到一个数据报时，其运输层并没有直接将数据报交给应用进程，而是将其交给了一个套接字进行处理，并由其转交给相应的应用进程。</p>
+<p>多路复用要求：套接字有唯一的标识，该标识的具体格式与它是UDP还是TCP类型有关；每个报文段都有特殊字段来指示该报文段要交付到的端口号</p>
+<p>UDP 套接字用一个二元组（目的IP地址、目标端口号）来标识的，TCP套接字是用四元组（源IP地址、源端口号、目的IP地址、目的端口号）来标识的。</p>
+<h4><span id="udp-用户数据报协议">UDP ：用户数据报协议</span></h4>
+<p>UDP 是一个简单的面向数据报的运输层协议：进程中每个输出操作都正好产生一个UDP数据报，并组装成一份代发送的 IP 数据报。它只是在 IP 的基础上扩展了多路复用/分解功能。</p>
+<p>UDP 具有以下特点：</p>
+<ol>
+<li>除了多路复用/分解及某种轻型的差错检测功能外，应用程序几乎都是直接与IP打交道。</li>
+<li>UDP称为无连接的，使用UDP时，在发送报文段之前，发送方和接收方的运输层实体之间没有握手过程，因此UDP具有较小的协议开销和发送数据之前的时延</li>
+<li>UDP不保证可靠交付，它继承了IP的尽力而为交付的特性</li>
+<li>UDP 没有流量控制和拥塞控制</li>
+<li>UDP 是面向报文的。应用程序交给UDP一个报文段，UDP就发送该报文段，不会将应用程序交来的报文段划分为若干个分组来发送，也不会将收到的若干个报文合并后再交付给应用程序。</li>
+<li>UDP具有较高的协议效率。其首部开销只有8字节，而TCP的首部为20个字节。</li>
+</ol>
+<p>UDP 报文段的首部格式：<br>
+<img src="http://img.blog.csdn.net/20160613165148430" alt="image"></p>
+<p>从图中可以看到，UDP 数据报是由UDP首部和放置在UDP报文段的的数据字段的应用层数据组成。</p>
+<p>UDP计算检验和的方法和计算IP数据报首部检验和的方式相似，不同之处在于IP数据报的检验和只检验IP数据报的首部，但UDP的检验和是把UDP报文段和伪首部放在一起检验，以防止将报文段意外的交付到错误的目的地。</p>
+<h4><span id="tcp传输控制协议">TCP：传输控制协议</span></h4>
+<p>TCP 能够提供面向连接、可靠数据传输和拥塞控制等服务。</p>
+<p>TCP 的主要特点可以归纳为以下几点：</p>
+<ol>
+<li>TCP 是面向连接的端到端协议，发送方再向接收方发送数据之前，必须通过“三次握手”。TCP连接的状态仅保留在两个端系统中，与中间路由和链路层交换机无关。</li>
+<li>TCP 连接是点到点的。也就是说TCP连接是在单个发送方与单个接收方之间的连接。</li>
+<li>TCP 连接提供全双工服务。</li>
+<li>TCP 提供可靠的交付服务，也就是说通过TCP连接传输的数据，能够保证无差错、不丢失、不重复并且按序的到达。</li>
+<li>TCP采用客户/服务器模式。</li>
+<li>TCP报文段的划分。当建立起一条TCP连接，两个应用进程就可以互相发送数据了，数据流通过套接字传输。</li>
+<li>TCP 面向字节流。TCP中的“流”是指流入到进程或从进程流出的字节序列。</li>
+<li>除此之外，TCP还有著名的流量控制与拥塞控制。</li>
+</ol>
 
                 
 
@@ -223,10 +329,10 @@
                 <!-- Pager -->
                 <ul class="pager">
                     
-                        <li class="previous">
-                            <a href="/2018/02/04/Mac下GitHub的使用/" data-toggle="tooltip" data-placement="top" title="Mac下GitHub的使用">&larr; Previous Post</a>
-                        </li>
                     
+                        <li class="next">
+                            <a href="/2018/03/05/“KVC-KVO的使用以及实现原理”/" data-toggle="tooltip" data-placement="top" title="“KVC/KVO的使用以及实现原理”">Next Post &rarr;</a>
+                        </li>
                     
                 </ul>
 
@@ -255,7 +361,7 @@
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">我是谁</span></a></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">TCP/IP协议分层模型</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">TCP/IP 的分层</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">IP：网际协议</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.1.1.</span> <span class="toc-nav-text">IP首部</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.1.2.</span> <span class="toc-nav-text">IP路由选择</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">运输层协议：TCP 和 UDP</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.1.</span> <span class="toc-nav-text">多路复用与多路分解</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.2.</span> <span class="toc-nav-text">UDP ：用户数据报协议</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.3.</span> <span class="toc-nav-text">TCP：传输控制协议</span></a></li></ol></li></ol></li></ol>
         
         </div>
       </aside>
@@ -275,7 +381,7 @@
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
-                          <a class="tag" href="/tags/#生活" title="生活">生活</a>
+                          <a class="tag" href="/tags/#计算机网络" title="计算机网络">计算机网络</a>
                         
                     </div>
                 </section>
@@ -310,8 +416,8 @@
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES * * */
     var disqus_shortname = "your-disqus-ID";
-    var disqus_identifier = "https://puqin2333.github.io/2018/01/24/我有路，正在走/";
-    var disqus_url = "https://puqin2333.github.io/2018/01/24/我有路，正在走/";
+    var disqus_identifier = "https://puqin2333.github.io/2018/03/06/TCP-IP-协议学习笔记/";
+    var disqus_url = "https://puqin2333.github.io/2018/03/06/TCP-IP-协议学习笔记/";
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
