@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          初探 iOS 内存管理 - 普帅同学的博客|puqin’s blog
+        
+    </title>
+
+    <link rel="canonical" href="https://puqin2333.github.io/2018/02/10/初探-iOS-内存管理/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('null')
+            /*post*/
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
+                            
+                        </div>
+                        <h1>初探 iOS 内存管理</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by Puqin Chen on
+                            2018-02-10
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">普帅同学的博客</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h3><span id="引言">引言：</span></h3>
+<h4><span id="arc的出生及成长背景">ARC的出生及成长背景</span></h4>
+<blockquote>
+<p>苹果在 2011 年的时候，在 WWDC 大会上提出了自动的引用计数（ARC）。ARC 背后的原理是依赖编译器的静态分析能力，通过在编译时找出合理的插入引用计数管理代码，从而彻底解放程序员。</p>
+<p>在 ARC 刚刚出来的时候，业界对此黑科技充满了怀疑和观望，加上现有的 MRC 代码要做迁移本来也需要额外的成本，所以 ARC 并没有被很快接受。直到 2013 年左右，苹果认为 ARC 技术足够成熟，直接将 macOS（当时叫 OS X）上的垃圾回收机制废弃，从而使得 ARC 迅速被接受。</p>
+<p>2014 年的 WWDC 大会上，苹果推出了 Swift 语言，而该语言仍然使用 ARC 技术，作为其内存管理方式。</p>
+</blockquote>
+<p><strong>以下是引用唐巧大神的话：</strong></p>
+<blockquote>
+<p>为什么我要提这段历史呢？就是因为现在的 iOS 开发者实在太舒服了，大部分时候，他们根本都不用关心程序的内存管理行为。但是，虽然 ARC 帮我们解决了引用计数的大部分问题，一些年轻的 iOS 开发者仍然会做不好内存管理工作。他们甚至不能理解常见的循环引用问题，而这些问题会导致内存泄漏，最终使得应用运行缓慢或者被系统终止进程。</p>
+</blockquote>
+<p>所以，我们每一个 iOS 开发者，需要理解引用计数这种内存管理方式，只有这样，才能处理好内存管理相关的问题。</p>
+<h3><span id="arc-出现之前的-mrc-时代">ARC 出现之前的 MRC 时代</span></h3>
+<p>MRC 时期，前辈们是这样写 iOS 代码的</p>
+<blockquote>
+<p>我们先写好一段 iOS 的代码，然后屏住呼吸，开始运行它，不出所料，它崩溃了。在 MRC 时代，即使是最牛逼的 iOS 开发者，也不能保证一次性就写出完美的内存管理代码。于是，我们开始一步一步调试，试着打印出每个怀疑对象的引用计数（Retain Count），然后，我们小心翼翼地插入合理的 retain 和 release 代码。经过一次又一次的应用崩溃和调试，终于有一次，应用能够正常运行了！于是我们长舒一口气，露出久违的微笑。</p>
+</blockquote>
+<h4><span id="引用计数">引用计数</span></h4>
+<p>这里面提到了引用计数，那么什么是引用计数？</p>
+<blockquote>
+<p>引用计数（Reference Count）是一个简单而有效的管理对象生命周期的方式。当我们创建一个新对象的时候，它的引用计数为 1，当有一个新的指针指向这个对象时，我们将其引用计数加 1，当某个指针不再指向这个对象是，我们将其引用计数减 1，当对象的引用计数变为 0 时，说明这个对象不再被任何指针指向了，这个时候我们就可以将对象销毁，回收内存。由于引用计数简单有效，除了 Objective-C 和 Swift 语言外，微软的 COM（Component Object Model ）、C++11（C++11 提供了基于引用计数的智能指针 share_prt）等语言也提供了基于引用计数的内存管理方式。</p>
+</blockquote>
+<h4><span id="手动管理引用计数的思考方式">手动管理引用计数的思考方式：</span></h4>
+<ul>
+<li>自己生成的对象，自己持有</li>
+<li>非自己生成的对象，自己也能持有</li>
+<li>不再需要自己持有的对象时释放</li>
+<li>非自己持有的对象无法释放</li>
+</ul>
+<p>有了这种思考方式，我们就生成了对应的 Objective-C 方法来管理引用计数。<br>
+下表是对象操作与 Objective-C 方法的对应</p>
+<table>
+<thead>
+<tr>
+<th>对象操作</th>
+<th>Objective-C 方法</th>
+<th>引用计数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>生成并持有对象</td>
+<td>alloc/new/copy/mutableCopy 等方法</td>
+<td>引用计数+1</td>
+</tr>
+<tr>
+<td>持有对象</td>
+<td>retain</td>
+<td>引用计数 +1</td>
+</tr>
+<tr>
+<td>释放对象</td>
+<td>release</td>
+<td>引用计数 -1</td>
+</tr>
+<tr>
+<td>废弃对象</td>
+<td>dealloc</td>
+<td>引用计数 -1</td>
+</tr>
+</tbody>
+</table>
+<p>如图，可清晰的看到 对象操作与 Objective-C 方法的对应</p>
+<p><img src="http://img.blog.csdn.net/20170524165637047?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaV9hbV93aGF0X2lfYW0=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>既然到了这儿，我们也能大概猜到 MRC 下程序员们是如何管理内存的了</p>
+<blockquote>
+<p>在 MRC 模式下，所有的对象都需要手动的添加 retain、release 代码来管理内存。使用 MRC ，需要<strong>遵守谁创建，谁回收的</strong>原则。也就是谁 alloc ，谁 release ；谁 retain ，谁 release。<br>
+当引用计数为0的时候，必须回收，引用计数不为0，不能回收，如果引用计数为0，但是没有回收，会造成内存泄露。如果引用计数为0，继续释放，会造成野指针。为了避免出现野指针，我们在释放的时候，会先让指针= nil。</p>
+</blockquote>
+<p>这块儿先不介绍这几个方法的底层实现，我们只是简单的通过一段简单的代码看看这几个方式是如何进行内存管理的。</p>
+<p>我们首先要修改工程设置，给 main.m 加上 -fno-objc-arc 的编译参数，这个参数可以启动手动管理引用计数的模式。<br>
+然后，我们先输入如下代码，通过 Log 看到相应的引用计数的变化。</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> main(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> * argv[]) &#123;</span><br><span class="line">    <span class="keyword">@autoreleasepool</span> &#123;</span><br><span class="line">        <span class="built_in">NSObject</span> *object = [[<span class="built_in">NSObject</span> alloc] init]; <span class="comment">// 引用计数 +1</span></span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"Reference Count = %lu"</span>, (<span class="keyword">unsigned</span> <span class="keyword">long</span>)[object retainCount]);</span><br><span class="line">        <span class="built_in">NSObject</span> *another = [object <span class="keyword">retain</span>];<span class="comment">//引用计数 +1</span></span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"Reference Count = %lu"</span>, [object retainCount]);</span><br><span class="line">        [another release];<span class="comment">//引用计数 -1</span></span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"Reference Count = %lu"</span>, [object retainCount]);</span><br><span class="line">        [object release];<span class="comment">// 到这儿，引用计数就为 0 了。</span></span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 打印的结果为：</span></span><br><span class="line"><span class="number">2017</span><span class="number">-05</span><span class="number">-23</span> <span class="number">16</span>:<span class="number">11</span>:<span class="number">35.035467</span>+<span class="number">0800</span> MRC[<span class="number">1148</span>:<span class="number">75832</span>] Reference Count = <span class="number">1</span></span><br><span class="line"><span class="number">2017</span><span class="number">-05</span><span class="number">-23</span> <span class="number">16</span>:<span class="number">11</span>:<span class="number">35.041784</span>+<span class="number">0800</span> MRC[<span class="number">1148</span>:<span class="number">75832</span>] Reference Count = <span class="number">2</span></span><br><span class="line"><span class="number">2017</span><span class="number">-05</span><span class="number">-23</span> <span class="number">16</span>:<span class="number">11</span>:<span class="number">35.041806</span>+<span class="number">0800</span> MRC[<span class="number">1148</span>:<span class="number">75832</span>] Reference Count = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<h3><span id="为什么需要引用计数">为什么需要引用计数</span></h3>
+<p>看完上述代码，大家可能会觉得，这就是引用计数啊，这不挺简单的吗？但是，我要告诉大家的，上面那段代码只是非常简单的例子，我们还看不出来引用计数真正的用处。因为该对象的生命期只是在一个函数内，所以在真实的应用场景下，我们在函数内使用一个临时的对象，通常是不需要修改它的引用计数的，只需要在函数返回前将该对象销毁即可。</p>
+<p><strong>引用计数真正派上用场的场景在于面向对象的程序设计架构中，用于对象之间传递和共享数据</strong>。</p>
+<p>假如对象 A 生成了一个对象 M，需要调用对象 B 的某一个方法，将对象 M 作为参数传递过去。在没有引用计数的情况下，一般内存管理的原则是 “谁申请谁释放”，那么对象 A 就需要在对象 B 不再需要对象 M 的时候，将对象 M 销毁。但对象 B 可能只是临时用一下对象 M，也可能觉得对象 M<br>
+很重要，将它设置成自己的一个成员变量，那这种情况下，什么时候销毁对象 M 就成了一个难题。</p>
+<p><img src="http://img.blog.csdn.net/20170524164719277?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaV9hbV93aGF0X2lfYW0=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>对于这种情况，我们可以在对象 A 在调用完对象 B 后直接释放参数对象 M， B 在对参数 M 做一个 Copy ，生成另一个对象 M1，B 自己管理 M1 。<br>
+<img src="http://img.blog.csdn.net/20170524165014340?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaV9hbV93aGF0X2lfYW0=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>还有一种方法就是对象 A 在构造完对象 M 之后，始终不销毁对象 M，由对象 B 来完成对象 M 的销毁工作。如果对象 B 需要长时间使用对象 M，它就不销毁它，如果只是临时用一下，则可以用完后马上销毁。如果情况在复杂点，出现个对象 C，那么我们的工作是不是就更复杂了呢。<br>
+<img src="http://img.blog.csdn.net/20170524165058326?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaV9hbV93aGF0X2lfYW0=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></p>
+<p>但是上述两种方法要么使得工作量大增，影响性能，要么使得对象间的耦合太过紧密，增大复杂性。</p>
+<p>所以，这个时候，我们的<strong>引用计数</strong>就可以很好的解决这个问题。在参数 M 的传递过程中，哪些对象需要长时间使用这个对象，就把它的引用计数加 1，使用完了之后再把引用计数减 1。所有对象都遵守这个规则的话，对象的生命期管理就可以完全交给引用计数了。我们也可以很方便地享受到共享对象带来的好处。</p>
+<h3><span id="arc-下的内存管理">ARC 下的内存管理</span></h3>
+<blockquote>
+<p>ARC 能够解决 iOS 开发中 90% 的内存管理问题，但是另外还有 10% 内存管理，是需要开发者自己处理的，这主要就是与底层 Core Foundation 对象交互的那部分，底层的 Core Foundation 对象由于不在 ARC 的管理下，所以需要自己维护这些对象的引用计数。</p>
+</blockquote>
+<p>这里我们先抛出 ARC 不能解决的问题：</p>
+<ul>
+<li><em>Block 等引发的循环引用问题</em></li>
+<li><em>底层 Core Foundation 对象需要手动管理</em></li>
+</ul>
+<h4><span id="所有权修饰符">所有权修饰符</span></h4>
+<p>ARC 有效时，id 类型和对象类型同 C 语言其他类型不同，其类型上必须附加所有权修饰符。所有权修饰符一共有四种。</p>
+<ul>
+<li><strong>_strong 修饰符</strong></li>
+</ul>
+<blockquote>
+<ul>
+<li>_strong修饰符：id 类型和对象类型默认的所有权修饰符；它可以保证将这些修饰符的自动变量初始化为nil.</li>
+<li>_strong 修饰符表示对对象的“强引用”; 附有_strong 修饰符的变量之间可以互相赋值。</li>
+<li>持有强引用的变量在超出其作用域时被废弃，随着强引用的失效，引用的对象会随之消失</li>
+<li>通过 _strong 修饰符，不必再次键入 retain 和 release</li>
+</ul>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    //  ARC 有效时</span><br><span class="line">    id obj = [[NSObject alloc] init];//自己生成并持有对象</span><br><span class="line">    //因为对象obj 强引用,自己也持有对象</span><br><span class="line">&#125;</span><br><span class="line">  <span class="comment">&lt;!--//超出作用域，强引用失效，自动释放自己持有的对象--&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="comment">//  ARC 无效时，该方法与 ARC 有效时一样</span></span><br><span class="line">    <span class="keyword">id</span> obj = [[<span class="built_in">NSObject</span> alloc] init];<span class="comment">//自己生成并持有对象</span></span><br><span class="line">    [obj release];<span class="comment">// 需要自己调用 release 方法来释放</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>_weak 修饰符</strong></li>
+</ul>
+<blockquote>
+<ul>
+<li>弱引用，不持有所指向对象的所有权</li>
+<li>可以避免循环引用</li>
+<li>在持有某对象的弱引用时，若该对象被废弃，则此弱引用将自动失效且处于 nil 被赋值的状态。</li>
+</ul>
+</blockquote>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 避免循环引用</span></span><br><span class="line">__<span class="keyword">weak</span> __<span class="keyword">typeof</span>(<span class="keyword">self</span>) weakSelf = <span class="keyword">self</span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 自己生成并持有对象</span></span><br><span class="line">    <span class="keyword">id</span> _<span class="keyword">strong</span> obj0 = [<span class="built_in">NSObject</span> alloc] init];</span><br><span class="line">    <span class="comment">// 因为 obj0 变量为强引用，所以自己持有对象</span></span><br><span class="line">    <span class="keyword">id</span> _<span class="keyword">weak</span> obj1 = obj0;</span><br><span class="line">    <span class="comment">// obj1 变量持有生成对象的弱引用</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* 因为 obj0 变量超出其作用域，强引用失效</span></span><br><span class="line"><span class="comment">* 所以自动释放自己持有的对象</span></span><br><span class="line"><span class="comment">* 因为对象的所有者不存在，所以废弃该对象</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>_unsafe_unretained 修饰符</strong></li>
+</ul>
+<blockquote>
+<ul>
+<li>不安全的所有权修饰符，附有 _unsafe_unretained 修饰符的变量不属于编译器测内存管理对象</li>
+<li>为兼容iOS5以下版本的产物，可以理解成MRC下的weak</li>
+<li>在使用 _unsafe_unretained 修饰符时，赋值给附有 _strong 修饰符的变量时，要确保被赋值的对象确实存在</li>
+</ul>
+</blockquote>
+<ul>
+<li><strong>_autoreleasing 修饰符</strong></li>
+</ul>
+<blockquote>
+<ul>
+<li>自动释放对象的引用，一般用于传递参数</li>
+<li>在 ARC 有效时，用 @autoreleasepool 块替代 NSAutoreleasePool 类，用附有 _autoreleasing 修饰符的变量替代 autorelease 方法。</li>
+<li>当没有显示指定所有权修饰符， id obj 和附有 _strong 修饰符 的obj 是完全一样的。编译器在对象变量超过作用域时，释放它并且自动将它注册到 autoreleasepool 中。</li>
+<li>使用 _weak 修饰符的变量时，要访问注册到 autoreleasepool 的对象</li>
+<li>id 的指针或对象的指针在没有显示指定时会被附加上 _autoreleasing 修饰符</li>
+</ul>
+</blockquote>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">id</span> _<span class="keyword">weak</span> obj1 = obj0;</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"class= %@"</span>,[obj1 <span class="keyword">class</span>]);</span><br></pre></td></tr></table></figure>
+<p>上述代码与以下代码相同</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">id</span> _<span class="keyword">weak</span> obj1 = obj0;</span><br><span class="line"><span class="keyword">id</span> _autoreleasing tmp = obj1;</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"class= %@"</span>,[obj1 <span class="keyword">class</span>]);</span><br></pre></td></tr></table></figure>
+<p>autoreleasepool 范围以块级源代码表示，提高了程序的可读性，所以今后在ARC无效时也推荐使用 @autoreleaseepool 块。<br>
+另外，无论 ARC 是否有效，调试用的非公开函数 <em>_objc_autoreleasePoolPrint()</em> 都可使用。<br>
+<em>_objc_rootRetainCount(obj)</em><br>
+利用这一函数可有效的帮助我们调试注册到 autoreleasepool 上的对象</p>
+<h4><span id="arc-的规则">ARC 的规则</span></h4>
+<ul>
+<li>不能使用 retain/release/retainCount/autorelease</li>
+<li>不能使用 NSAllocateObject/NSDeallocateObject</li>
+<li>须遵循内存管理的方式命名规则</li>
+<li>不要显示调用 dealloc</li>
+<li>使用 @autorealeasepool 块代替 NSAutoreleasePool</li>
+<li>不要使用区域（NSZone）</li>
+<li>对象型变量不能作为 C 语言结构体的成员</li>
+<li>显示转换 ‘id’ 和 ‘void’</li>
+</ul>
+<h4><span id="循环引用问题">循环引用问题</span></h4>
+<blockquote>
+<p>简单的来说循环引用就是对象 A 和对象 B，相互引用了对方作为自己的成员变量，只有当自己销毁时，才会将成员变量的引用计数减 1。因为对象 A 的销毁依赖于对象 B 销毁，而对象 B 的销毁与依赖于对象 A 的销毁，这样就造成了我们称之为循环引用（Reference Cycle）的问题，这两个对象即使在外界已经没有任何指针能够访问到它们了，它们也无法被释放。实际上，多个对象依次持有对方，形式一个环状，也可以造成循环引用问题，而且在真实编程环境中，环越大就越难被发现。</p>
+</blockquote>
+<ul>
+<li><strong>解决循环引用的问题的两个方法</strong></li>
+</ul>
+<ol>
+<li>知道会产生循环引用，在合理的位置主动断开环中的一个引用，使得对象得以回收<br>
+<img src="http://img.blog.csdn.net/20170524165333139?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvaV9hbV93aGF0X2lfYW0=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述"></li>
+</ol>
+<blockquote>
+<p>主动断开循环引用这种方式常见于各种与 block 相关的代码逻辑中。<br>
+但是主动断开循环引用这种操作依赖于程序员自己手工显式地控制，相当于回到了以前 “谁申请谁释放” 的内存管理年代，它依赖于程序员自己有能力发现循环引用并且知道在什么时机断开循环引用回收内存（这通常与具体的业务逻辑相关）</p>
+</blockquote>
+<ol start="2">
+<li>常见的办法是使用弱引用 (weak reference) 的办法，弱引用虽然持有对象，但是并不增加引用计数，这样就避免了循环引用的产生。在 iOS 开发中，弱引用通常在 delegate 模式中使用。</li>
+</ol>
+<ul>
+<li><strong>使用 Xcode 检测循环引用</strong></li>
+</ul>
+<h4><span id="core-foundation-对象的内存管理">Core Foundation 对象的内存管理</span></h4>
+<blockquote>
+<p>Core Foundation 对象主要使用在用 C语言编写的 Core Foundation  框架中,并使用引用计数的对象；在 ARC 无效时 ，Core Foundation 框架中的 retain/release 分别是 CFRetain/CFRelease；因为 Core Foundation 对象和 Objective-C 对象没有什么区别，所以在 ARC 无效时，可以使用简单的 C 语言就可以实现互换。</p>
+</blockquote>
+<p>在 ARC 下，我们有时需要将一个 Core Foundation 对象转换成一个 Objective-C 对象，这个时候我们需要告诉编译器，转换过程中的引用计数需要做如何的调整。这就引入了 bridge 相关的关键字，以下是这些关键字的说明：</p>
+<ul>
+<li>==__bridge== : 只做类型转换，不修改相关对象的引用计数，原来的 Core Foundation 对象在不用时，需要调用 CFRelease 方法。</li>
+<li>==__bridge_retained== ：类型转换后，将相关对象的引用计数加 1，原来的 Core Foundation 对象在不用时，需要调用 CFRelease 方法。</li>
+<li>==__bridge_transfer== ：类型转换后，将该对象的引用计数交给 ARC 管理，Core Foundation 对象在不用时，不再需要调用 CFRelease 方法。</li>
+</ul>
+<h3><span id="总结">总结</span></h3>
+<p>这篇文章并没有涉及 MRC 以及 ARC 实现的底层，所涉及到的知识也是个人看完 高级编程第一章的知识以及 唐巧大神的文章后，自己总结的笔记。在之后的探索中，也会从底层出发来剖析内存管理的知识。</p>
+<p>参考博客：<a href="http://www.tuicool.com/articles/eErIviz" target="_blank" rel="noopener">唐巧的理解 iOS 内存管理</a></p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2018/03/05/“KVC-KVO的使用以及实现原理”/" data-toggle="tooltip" data-placement="top" title="“KVC/KVO的使用以及实现原理”">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2018/02/04/Mac下GitHub的使用/" data-toggle="tooltip" data-placement="top" title="Mac下GitHub的使用">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">引言：</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">ARC的出生及成长背景</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">ARC 出现之前的 MRC 时代</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">引用计数</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">手动管理引用计数的思考方式：</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">为什么需要引用计数</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">ARC 下的内存管理</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.1.</span> <span class="toc-nav-text">所有权修饰符</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.2.</span> <span class="toc-nav-text">ARC 的规则</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.3.</span> <span class="toc-nav-text">循环引用问题</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.4.</span> <span class="toc-nav-text">Core Foundation 对象的内存管理</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">总结</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="http://beantech.org" target="_blank">Bean Tech</a></li>
+                    
+                        <li><a href="http://blog.kaijun.rocks" target="_blank">Kaijun&#39;s Blog</a></li>
+                    
+                        <li><a href="http://huangxuan.me" target="_blank">Hux Blog</a></li>
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "https://puqin2333.github.io/2018/02/10/初探-iOS-内存管理/";
+    var disqus_url = "https://puqin2333.github.io/2018/02/10/初探-iOS-内存管理/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/puqin.chen">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="http://weibo.com/5720008246">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/puqin2333">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; Puqin Chen 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://beantech.org">BeanTech</a> | 
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://puqin2333.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="https://puqin2333.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
