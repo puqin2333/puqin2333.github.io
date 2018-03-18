@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          UIView 与 CALayer的学习 - 普帅同学的博客|puqin’s blog
+        
+    </title>
+
+    <link rel="canonical" href="https://puqin2333.github.io/2018/03/18/UIView-与-CALayer的学习/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('null')
+            /*post*/
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
+                            
+                        </div>
+                        <h1>UIView 与 CALayer的学习</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by Puqin Chen on
+                            2018-03-18
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">普帅同学的博客</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <blockquote>
+<p>我们很清楚 UIView 和 CALayer 之间的区别，但是当面试官问了我 anchorpoint 与 centerPoint 之间的区别的时候，我就知道面试GG了。下来之后，就抓紧了解了一下,并深入学习了 UIView 的绘制过程，整理了这篇文章。</p>
+</blockquote>
+<h2><span id="uiview-和-calayer-的区别">UIView 和 CALayer 的区别</span></h2>
+<p>老生长谈的话题了，大部分人也能流畅的回答其两者的区别。但是除了第一点之外，其他区别的原因是什么，我相信大家也有点迷糊吧。</p>
+<ul>
+<li>
+<p><strong>事件响应</strong></p>
+<p>UIView 和 CALayer 最终都是继承自 NSObject,但是 UIView  直接继承自 UIResponder, 正是因为这层继承，才可以让UIView 可以响应事件。</p>
+</li>
+<li>
+<p><strong>View 和 CALayer 的 Frame 映射及 View 如何创建 CALayer</strong></p>
+<p>一个 Layer 的 frame 是由它的 anchorPoint、position、bounds 和 transform 共同决定，而一个 View 的 frame 只是简单的返回 Layer 的 frame，同样 View 的 Center 和 Bounds 只是直接返回layer 对应的 Position 和 Bounds。</p>
+<p>我们在初始化 view 时，会调用私有方法[UIView _createLayerWithFrame] 去创建 CALayer.</p>
+<p>大致调用顺序如下：</p>
+</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[UIView _createLayerWithFrame]</span><br><span class="line">[Layer setBounds:bounds]</span><br><span class="line">[UIView setFrame：Frame]</span><br><span class="line">[Layer setFrame:frame]</span><br><span class="line">[Layer setPosition:position]</span><br><span class="line">[Layer setBounds:bounds]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>
+<p><strong>UIView主要是对显示内容的管理，而 CALayer 主要侧重显示内容的绘制</strong></p>
+<p>UIView 是 CALayer 的 CALayerDelegate，在 View显示的时候，UIView 作为 Layer 的 CALayerDelegate,View 的显示内容由内部的 CALayer display。</p>
+</li>
+<li>
+<p><strong>在做 iOS 动画的时候，修改非 RootLayer的属性（譬如位置、背景色等）会默认产生隐式动画，而修改UIView则不会。</strong></p>
+<p>对于每个 UIView，都有一个 layer，我们将此 layer 称为 RootLayer，不是 View 根layer 的叫做非RootLayer。</p>
+<p>我们对 UIView 的属性修改时不会产生默认动画，而CALayer 默认支持隐式动画。对单独的 layer 属性修改会产生( UIView 在默认情况下禁止了 layer 动画，但是在 animation block 中又重新启动了它)。<br>
+在任何可动画的 layer 属性改变时，<br>
+layer 通过向它的 delegate 发送 <code>actionForLayer: forKey:</code> 消息来询问提供一个对应属性变化的 action。delegate 可以通过返回以下三者之一来进行响应：</p>
+<ul>
+<li>它可以返回一个动作对象，这种情况下 layer 将使用这个动作。</li>
+<li>它可以返回一个 nil， 这样 layer 就会到其他地方继续寻找。</li>
+<li>它可以返回一个 NSNull 对象，告诉 layer 这里不需要执行一个动作，搜索也会就此停止。</li>
+</ul>
+</li>
+</ul>
+<p>layer 内部维护着三叉树, 分别是 presentLayer Tree(动画树), modeLayer Tree(模型树), Render Tree (渲染树)，在做 iOS动画的时候，我们修改动画的属性，在动画的其实是 Layer 的 presentLayer的属性值,而最终展示在界面上的其实是提供 View的modelLayer</p>
+<h4><span id="uiview-的-layer-在系统内维护的三份树">UIView 的 Layer 在系统内维护的三份树</span></h4>
+<p>1.逻辑树（模型树）：这里是代码可以操作的，例如更改 layer 的属性等等</p>
+<p>2.动画树，这是也给中间层，系统在这一层上更改属性，进行各种渲染。</p>
+<ol start="3">
+<li>显示树，这棵树的内容是当前正被显示在屏幕上的内容</li>
+</ol>
+<h2><span id="frame的确定">Frame的确定</span></h2>
+<p>从上面，我们也得知了 view.frame 只是简单的返回了 layer.frame ，而 layer 的frame 却是由 layer 的 bounds、anchorPoint、transform 和 position 共同决定的。所以，接下来，我们会讨论 CALayer 的 Frame。</p>
+<h3><span id="frame-的依赖">Frame 的依赖</span></h3>
+<p>frame是一个派生属性，实际上它基于一些其他的属性。实际上在计算frame值的时候会参考 bounds、anchorPoint、transform 和 position 这四个属性。</p>
+<h4><span id="bounds">bounds</span></h4>
+<blockquote>
+<p>frame 和 bounds 的区别：frame的参照点是父视图的坐标系统，bounds 的参照点是本地坐标系统，通过修改 view 的 bounds 属性可以修改本地坐标系统的原点位置。它是参考自己坐标系，它可以修改自己坐标系的原点位置，进而影响到“子view”的显示位置。</p>
+</blockquote>
+<p>bounds 混合了层的内部和外部。 bounds.size 定义了层本身的面积，声明了它所存在的区域。设置masksToBounds为YES会把所有子层超出bounds范围的部分裁掉。另一方面，bounds的origin属性并不影响层本身的布局；然而它会影响它内部的子层的布局方式。bounds.origin定义了层内部坐标系的原点。</p>
+<p>下面展示，bounds.origin 如何工作。</p>
+<ol>
+<li>设置 bounds.origin = CGPointMake(20.0f, 30.0f);</li>
+</ol>
+<p><img src="http://cdn.cocimg.com/cms/uploads/allimg/131209/4196_131209104846_1.png" alt="image"></p>
+<ol start="2">
+<li>定义本地坐标系。直接把层的左上角放到bounds.origin上。</li>
+</ol>
+<p><img src="http://cdn.cocimg.com/cms/uploads/allimg/131209/4196_131209104855_1.png" alt="image"></p>
+<h4><span id="anchorpoint-与-position">anchorPoint 与 position</span></h4>
+<p><strong>position</strong> 是 layer 相对于superLayer坐标空间的位置，它的位置确定是根据 anchorPoint 的。</p>
+<p>它是设置 CALayer 在父层中的位置，并以父层的左上角为坐标原点。</p>
+<p><strong>anchorPoint</strong> 通常被翻译为锚点，为旋转、缩放等空间变化提供了中心点。</p>
+<p>决定着 CALayer 身上的哪个点会在 position 属性所指的位置，可用来将控件放到指定位置（设置锚点并把锚点放到  position 位置），它以自己的左上角为原点，并且它的x、y 取值范围都是0 ～ 1，默认值为（0.5，0.5）。</p>
+<p>确切地说，position 是 layer 中的 anchorPoint 点在 superLayer 中的位置坐标。position 点是相对 superLayer 的，anchorPoint 点是相对 layer 的，两者是相对不同的坐标空间的一个重合点。</p>
+<p>如下图，图中分 iOS 与 MacOS ，因为两者的坐标系不相同，iOS 坐标原点在左上角，MacOS 坐标原点在左下角。我们观察到 position 和 anchorPoint 确实是个重合点。</p>
+<p><img src="http://kittenyang.com/content/images/2014/Nov/QzAreq.png" alt="image"></p>
+<h4><span id="anchorpoint-position-frame-之间的关系">anchorPoint、position、frame 之间的关系</span></h4>
+<ol>
+<li>
+<p>三者的计算公式：</p>
+<p>position.x = frame.origin.x + anchorPoint.x * bounds.size.width；<br>
+position.y = frame.origin.y + anchorPoint.y * bounds.size.height；</p>
+</li>
+<li>
+<p>position 和 anchorPoint 的联系：anchorPoint和position互不影响，受影响的只有frame。这样也就解释了修改anchorPoint 会移动layer,因为 position 不会受到影响，只能是 frame.origin 做相应的改变，因而会移动layer。</p>
+</li>
+</ol>
+<h2><span id="uiview-的绘制">UIView 的绘制</span></h2>
+<h3><span id="无处不在的-runloop">无处不在的 RunLoop</span></h3>
+<p>iOS 的 RunLoop 是一个 60fps 的回调，也就是说每 16.7 ms 绘制一次屏幕，在这个时间段内 cpu 要完成 view 缓冲区的创建、view 内容的绘制等工作。然后将这个缓冲区交给 GPU 渲染，这个过程包括 view 的拼接，纹理的渲染等，然后最终显示在屏幕上。我们手机时常遇到的界面卡的原因就是CPU或者GPU压力过大等导致的。</p>
+<h3><span id="ios-渲染过程">iOS 渲染过程</span></h3>
+<p><img src="http://blog.ibireme.com/wp-content/uploads/2015/11/ios_screen_display.png" alt=""><br>
+计算机中CPU、GPU和显示器协同工作，工作方式具体如下：<br>
+CPU 计算好显示内容提交给 GPU，GPU 渲染完成后将渲染结果放入帧缓冲区，随后视频控制器会按照 VSync(垂直同步信号)信号逐行读取帧缓冲区的数据，经过可能的数模转化后传递给显示器显示。</p>
+<p>在最简单的情况下，帧缓冲区只有一个，这种情况下对帧缓冲区的读取和刷新都有了比较大的效率问题。为解决效率问题，一般引入两个帧缓冲区，也叫双缓冲机制。在双缓冲机制下，GPU 会预先渲染好一帧，然后放入缓冲区，让视频控制器读取，当下一帧渲染好以后，GPU 会直接把视频控制器的指针指向第二个缓冲器，效率就会相应提升。</p>
+<p>但是这样还会引入新问题。当一帧还未读取完成时，GPU 将新的一帧提交到帧缓冲区并交换两个缓冲区，视频控制器就会显示新的一帧数据，这样就会造成画面撕裂。为了解决这个问题，GPU 会有一个垂直同步机制(简写同样是 V-Sync)，当开启垂直同步时，GPU 会等待显示器发出 VSync 信号之后，才进行新的一帧渲染和缓冲区更新。这样能够解决上述问题，但同样会消费更多的计算资源。</p>
+<blockquote>
+<p>界面卡顿的原因：在 VSync 信号到来之后，系统图形服务会通过 CADisplayLink 等机制通知 APP，APP 的主线程就会开始在 CPU 中计算显示内容，随后CPU将计算好的内容交给 GPU，进行渲染，随后提交到帧缓冲区，等待下一次 VSync 信号到来时显示到屏幕上。如果在下一个 VSync 时间内，CPU 或者 GPU 没有完成内容提交，那一帧就会被废弃，等待下一次在显示，这时，显示屏就会保留之前的内容不变。</p>
+</blockquote>
+<h3><span id="view-绘制的步骤">View 绘制的步骤</span></h3>
+<ul>
+<li>每一个 View 都有一个 Layer,每个 Layer 都有一个 Content，Content指向一块缓存，叫做 backing store</li>
+<li>View 的绘制和渲染是两个过程，当 View 被绘制时，CPU 执行 drawRect，通过 context 将数据写入 backing store</li>
+<li>当 backing store 写完之后，交给 GPU 去渲染，将 backing store 中的 bitmap 数据显示在屏幕上。</li>
+</ul>
+<p>下图反应了这个过程：<br>
+<img src="http://om50f51ai.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-03-24%20%E4%B8%8B%E5%8D%8810.31.25.png" alt="View绘制过程"></p>
+<h4><span id="cpu-的工作">CPU 的工作</span></h4>
+<ol>
+<li>CPU 为 Layer 分配一块内存用来绘制 Bitmap，叫做 backing store</li>
+<li>创建指向 Bitmap 缓冲区的指针CGContextRef</li>
+<li>通过 Core Graphic 的 API，Quartz2D 绘制 Bitmap</li>
+<li>将 Layer 的 content 指向生成的 Bitmap</li>
+<li>清空 dirty flag</li>
+</ol>
+<p>这样 CPU 的绘制就基本完成了，这块儿最耗时的地方往往是 Core Graphic 的绘制。</p>
+<p><strong>CPU 中耗时的原因</strong>：</p>
+<ul>
+<li>对象创建：对象的创建也是会消耗一定的资源，应该尽量使用轻量级对象代替重量级对象，比如若没有触摸事件，可以使用 CALayer 替代 UIView。尽量推迟对象的创建时间，可以复用的尽量复用。</li>
+<li>对象调整：对象的属性调整也是经常消耗资源的地方。尽量减少不必要的属性修改。</li>
+<li>布局计算：布局计算通常是最常见的消耗 CPU 的事件了，如果可以，尽量在后台提前计算好视图布局，并进行缓存。</li>
+<li>AutoLayer：虽然是苹果所提倡的方法，但是对于复杂视图来说，往往会带来非常严重的性能问题。所谓的 AutoLayer 最终还是要计算出相应的 frame，但是相比直接设置 frame，AutoLayer 需要计算一个多元方程，可想而知这样对性能消耗是很大的。</li>
+<li>文本计算：文本的宽高计算也会占用很大一部分资源，尽量放到后台计算。</li>
+<li>文本渲染：常见的文本控件在底层都是通过 CoreText 排版的，绘制为 Bitmap 显示的，而且排版和绘制都是在主线程中进行的，当显示大量文本时，对 CPU 的压力很大。可以自定义文本控件，并使用最底层的 CoreText 对文本进行异步绘制并缓存。</li>
+<li>图片的解码：解码过程会在 CALayer 被提交到 GPU 前，在主线程中进行解码。想要优化，可以在后台线程先把图片绘制到 CGBitmapContext 中，然后从 Bitmap 直接创建图片。</li>
+</ul>
+<h4><span id="gpu的工作">GPU的工作</span></h4>
+<p>GPU 的大致工作模式如下：</p>
+<p>Core Animation对OpenGL的api有一层封装，当我们的要渲染的layer已经有了bitmap content的时候，这个content一般来说是一个CGImageRef，CoreAnimation会创建一个OpenGL的Texture并将CGImageRef（bitmap）和这个Texture绑定，通过TextureID来标识。</p>
+<p>这个对应关系建立起来之后，剩下的任务就是GPU如何将Texture渲染到屏幕上了。</p>
+<p><img src="http://om50f51ai.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-03-24%20%E4%B8%8B%E5%8D%8810.31.54.png" alt="GPU工作模式"></p>
+<p>整个过程也就一件事，CPU 将准备好的 Bitmap 放到 RAM 里，GPU 去搬这块儿内存到 VRAM 中出来。</p>
+<p>GPU 的挑战主要有两点：</p>
+<ul>
+<li>将数据从 RAM 搬到 VRAM 中</li>
+<li>将Textture 渲染到屏幕上</li>
+</ul>
+<p>主要瓶颈在第二点上，渲染基本要处理几个问题：</p>
+<ul>
+<li>多个纹理拼到一块的过程，若 View 的图层很复杂，或者 View 是半透明的，都会给 GPU 带来额外的计算工作。</li>
+<li>image 的像素大小问题</li>
+<li>对 Layer 设置圆角的问题，渲染这样的 Layer时，需要额外开辟内存，绘制好 radius、mask，然后将绘制好的 Bitmap 重新赋值给 Layer。</li>
+</ul>
+<h4><span id="runloop-任务分发">RunLoop 任务分发</span></h4>
+<p><img src="http://blog.ibireme.com/wp-content/uploads/2015/11/ios_vsync_runloop.png" alt="iOS显示系统"></p>
+<p>iOS显示系统是由 VSync 信号驱动的，VSync 信号由硬件时钟生成，每秒钟发出 60 次。iOS 图形服务接收到 VSync 信号后，会通过 IPC 通知到 App 内。App 的 Runloop 在启动后会注册对应的 CFRunLoopSource 通过 mach_port 接收传过来的时钟信号通知，随后 Source 的回调会驱动整个 App 的动画与显示。</p>
+<p>Core Animation 在 RunLoop 中注册了一个 Observer，监听了 BeforeWaiting 和 Exit 事件。这个 Observer 的优先级是 2000000，低于常见的其他 Observer。当一个触摸事件到来时，RunLoop 被唤醒，App 中的代码会执行一些操作，比如创建和调整视图层级、设置 UIView 的 frame、修改 CALayer 的透明度、为视图添加一个动画；这些操作最终都会被 CALayer 捕获，并通过 CATransaction 提交到一个中间状态去（CATransaction 的文档略有提到这些内容，但并不完整）。当上面所有操作结束后，RunLoop 即将进入休眠（或者退出）时，关注该事件的 Observer 都会得到通知。这时 CA 注册的那个 Observer 就会在回调中，把所有的中间状态合并提交到 GPU 去显示；如果此处有动画，CA 会通过 DisplayLink 等机制多次触发相关流程。</p>
+<p>这个函数内部的调用栈大概是这样的：</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">_ZN2CA11Transaction17observer_callbackEP19__CFRunLoopObservermPv</span>()</span><br><span class="line">    <span class="selector-tag">QuartzCore</span><span class="selector-pseudo">:CA</span><span class="selector-pseudo">::Transaction</span><span class="selector-pseudo">::observer_callback</span>:</span><br><span class="line">        <span class="selector-tag">CA</span><span class="selector-pseudo">::Transaction</span><span class="selector-pseudo">::commit()</span>;</span><br><span class="line">            <span class="selector-tag">CA</span><span class="selector-pseudo">::Context</span><span class="selector-pseudo">::commit_transaction()</span>;</span><br><span class="line">                <span class="selector-tag">CA</span><span class="selector-pseudo">::Layer</span><span class="selector-pseudo">::layout_and_display_if_needed()</span>;</span><br><span class="line">                    <span class="selector-tag">CA</span><span class="selector-pseudo">::Layer</span><span class="selector-pseudo">::layout_if_needed()</span>;</span><br><span class="line">                          <span class="selector-attr">[CALayer layoutSublayers]</span>;</span><br><span class="line">                          <span class="selector-attr">[UIView layoutSubviews]</span>;</span><br><span class="line">                    <span class="selector-tag">CA</span><span class="selector-pseudo">::Layer</span><span class="selector-pseudo">::display_if_needed()</span>;</span><br><span class="line">                          <span class="selector-attr">[CALayer display]</span>;</span><br><span class="line">                          <span class="selector-attr">[UIView drawRect]</span>;</span><br></pre></td></tr></table></figure>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                        <li class="next">
+                            <a href="/2018/03/13/RunLoop的深入学习/" data-toggle="tooltip" data-placement="top" title="RunLoop的深入学习">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">UIView 和 CALayer 的区别</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.0.1.</span> <span class="toc-nav-text">UIView 的 Layer 在系统内维护的三份树</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">Frame的确定</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">Frame 的依赖</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.1.1.</span> <span class="toc-nav-text">bounds</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.1.2.</span> <span class="toc-nav-text">anchorPoint 与 position</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.1.3.</span> <span class="toc-nav-text">anchorPoint、position、frame 之间的关系</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">UIView 的绘制</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">无处不在的 RunLoop</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">iOS 渲染过程</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.3.</span> <span class="toc-nav-text">View 绘制的步骤</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.3.1.</span> <span class="toc-nav-text">CPU 的工作</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.3.2.</span> <span class="toc-nav-text">GPU的工作</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.3.3.</span> <span class="toc-nav-text">RunLoop 任务分发</span></a></li></ol></li></ol></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="http://beantech.org" target="_blank">Bean Tech</a></li>
+                    
+                        <li><a href="http://blog.kaijun.rocks" target="_blank">Kaijun&#39;s Blog</a></li>
+                    
+                        <li><a href="http://huangxuan.me" target="_blank">Hux Blog</a></li>
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "https://puqin2333.github.io/2018/03/18/UIView-与-CALayer的学习/";
+    var disqus_url = "https://puqin2333.github.io/2018/03/18/UIView-与-CALayer的学习/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/puqin.chen">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="http://weibo.com/5720008246">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/puqin2333">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; Puqin Chen 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://beantech.org">BeanTech</a> | 
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://puqin2333.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="https://puqin2333.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
