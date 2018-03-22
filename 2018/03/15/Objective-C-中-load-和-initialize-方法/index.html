@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          Objective-C 中 load 和 initialize 方法 - 普帅同学的博客|puqin’s blog
+        
+    </title>
+
+    <link rel="canonical" href="https://puqin2333.github.io/2018/03/15/Objective-C-中-load-和-initialize-方法/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('null')
+            /*post*/
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
+                            
+                        </div>
+                        <h1>Objective-C 中 load 和 initialize 方法</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by Puqin Chen on
+                            2018-03-15
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">普帅同学的博客</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <blockquote>
+<p>Objective-C 中绝大部分的类都继承自 NSObject 类。而在 NSObject 类中有两个特殊的类方法 + load 和 + initialize，用于类的初始化。</p>
+</blockquote>
+<h3><span id="load-和-initialize-的共同特点">load 和 initialize 的共同特点</span></h3>
+<p>load 和 initialize 有很多共同点，比如：</p>
+<ol>
+<li>在不考虑开发者主动使用的情况下，系统最多调用一次</li>
+<li>如果父类和子类都被调用，父类的调用一定在子类之前</li>
+<li>都是为了应用运行时提前创建合适的运行环境</li>
+</ol>
+<h3><span id="load-方法">load 方法</span></h3>
+<p>+load 方法是当类或分类被添加到 OC runtime 时被调用，实现这个方法可以让我们在类加载的时候执行一些类相关的行为。子类的 +load 方法会在它的所有父类的 +load 方法之后执行，而分类的 +load 是在它的主类的 +load 方法之后执行。但是不同类之间的 +load 方法的调用顺序是不确定的。</p>
+<p>总结为以下几点：</p>
+<ul>
+<li>调用时机比较早，运行环境有不确定因素。具体说来，在 iOS 上通常就是 APP 启动时进行加载，但当 load 调用的时候，并不能保证所有类都加载完成且可用，必要时还要自己负责做 auto release 处理。</li>
+<li>对于有依赖关系的两个库中，被依赖的类的load 会优先调用。但是在一个库之内，调用顺序是不确定的。</li>
+<li>对于一个类，没有 load 方法实现就不会调用，不会考虑对 NSObject 的继承。</li>
+<li>一个类的load 方法不用写明[super load], 父类就会收到调用，并且在子类之前。</li>
+<li>Catagory 的 load 也会收到调用，但是顺序在主类的 load 调用之后。</li>
+<li>不会直接触发 initialize 的调用</li>
+<li>调用类的 load 方法，它是直接使用函数内存地址的方式 <code>(*load_method)(cls, SEL_load);</code> 对 +load 方法进行调用的，而不是使用消息 <strong>objc_msgSend</strong> 的方式。这种调用方式也就使得子类、分类以及父类的 +load 方法的实现被区别对待了</li>
+</ul>
+<h3><span id="initialize-方法">initialize 方法</span></h3>
+<p>+initialize 方法是在类或者它的子类收到第一条消息之前被调用的，这里所指的消息包括实例方法和类方法的调用。也就是说 + initialize 方法是以懒加载的方式被调用的，如果程序一直没有给某个类或者它的子类发送消息，那么这个类的 + initialize 方法永远不会被调用。这样，可以节省系统资源，避免浪费。</p>
+<p>总结为以下几点：</p>
+<ul>
+<li>initialize 的自然调用是在第一次主动使用当前类的时候（以懒加载的方式）</li>
+<li>在 initialize 方法收到调用时，运行环境基本健全</li>
+<li>initialize 的运行过程中，是保证线程安全的。</li>
+<li>和 load 不同，即使子类不实现 initialize 方法，会把父类的实现继承过来调用一遍。</li>
+<li>runtime 使用了发送消息 <code>objc_msgSend</code> 的方式对 <code>+initialize</code> 方法进行调用</li>
+</ul>
+<p>由于 initialize 的这些特点，使得其应用要比 load 要稍微广泛一些，可用作一些初始化工作，或者单例模式的一种实现方案。</p>
+<h3><span id="从源码学习-load-和-initialize">从源码学习 load 和 initialize</span></h3>
+<p><strong>+load 方法</strong></p>
+<p>打开 runtime 工程，我们接下来看看与 +load 方法相关的几个关键函数。首先是文件 <code>objc-runtime-new.mm</code> 中的 <code>void prepare_load_methods(header_info *hi)</code> 函数：</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// 该函数提前准备好满足 load 方法调用条件的类和分类，以供接下来的调用。</span></span><br><span class="line">void prepare_load_methods(header_info *hi)</span><br><span class="line">&#123;</span><br><span class="line">    size_t <span class="keyword">count</span>, i;</span><br><span class="line"></span><br><span class="line">    rwlock_assert_writing(&amp;runtimeLock);</span><br><span class="line">    <span class="comment">//获取满足条件的类</span></span><br><span class="line">    classref_t *classlist =</span><br><span class="line">        _getObjc2NonlazyClassList(hi, &amp;<span class="keyword">count</span>);</span><br><span class="line">    <span class="keyword">for</span> (i = 0; i &lt; <span class="keyword">count</span>; i++) &#123;</span><br><span class="line">        schedule_class_load(remapClass(classlist[i]));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//获取满足条件的分类</span></span><br><span class="line">    category_t **categorylist = _getObjc2NonlazyCategoryList(hi, &amp;<span class="keyword">count</span>);</span><br><span class="line">    <span class="keyword">for</span> (i = 0; i &lt; <span class="keyword">count</span>; i++) &#123;</span><br><span class="line">        category_t *<span class="keyword">cat</span> = categorylist[i];</span><br><span class="line">        <span class="keyword">Class</span> cls = remapClass(<span class="keyword">cat</span>-&gt;cls);</span><br><span class="line">        <span class="keyword">if</span> (!cls) <span class="keyword">continue</span>;  <span class="comment">// category for ignored weak-linked class</span></span><br><span class="line">        realizeClass(cls);</span><br><span class="line">        <span class="keyword">assert</span>(cls-&gt;ISA()-&gt;isRealized());</span><br><span class="line">        add_category_to_loadable_list(<span class="keyword">cat</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中，在处理类的时候，调用了同文件中的另一个函数 <code>static void schedule_class_load(Class cls)</code> 来执行具体的操作。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> void schedule_class_load(<span class="class"><span class="keyword">Class</span> <span class="title">cls</span>)</span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!cls) <span class="keyword">return</span>;</span><br><span class="line">    assert(cls-&gt;isRealized());  <span class="comment">// _read_images should realize</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (cls-&gt;data()-&gt;flags &amp; RW_LOADED) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 确保父类优先</span></span><br><span class="line">    schedule_class_load(cls-&gt;superclass);</span><br><span class="line"></span><br><span class="line">    add_class_to_loadable_list(cls);</span><br><span class="line">    cls-&gt;setInfo(RW_LOADED);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在这个函数中，我们发现对于 弗雷采用递归调用，以确保父类优先执行。<br>
+当 <code>void prepare_load_methods(header_info *hi)</code> 函数执行完后，当前所有满足 <code>+load</code> 方法调用条件的类和分类就被分别存放在全局变量 <code>loadable_classes</code> 和 <code>loadable_categories</code> 中。</p>
+<p>准备好类和分类后，接下来就是对它们的 <code>+load</code> 方法进行调用了。打开文件 objc-loadmethod.m ，找到其中的 <code>void call_load_methods(void)</code> 函数。</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> call_load_methods(<span class="keyword">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">BOOL</span> loading = <span class="literal">NO</span>;</span><br><span class="line">    <span class="built_in">BOOL</span> more_categories;</span><br><span class="line"></span><br><span class="line">    recursive_mutex_assert_locked(&amp;loadMethodLock);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Re-entrant calls do nothing; the outermost call will finish the job.</span></span><br><span class="line">    <span class="keyword">if</span> (loading) <span class="keyword">return</span>;</span><br><span class="line">    loading = <span class="literal">YES</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">void</span> *pool = objc_autoreleasePoolPush();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">// 1. Repeatedly call class +loads until there aren't any more </span></span><br><span class="line">        <span class="keyword">while</span> (loadable_classes_used &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            call_class_loads();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 2. Call category +loads ONCE</span></span><br><span class="line">        more_categories = call_category_loads();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 3. Run more +loads if there are classes OR more untried categories</span></span><br><span class="line">    &#125; <span class="keyword">while</span> (loadable_classes_used &gt; <span class="number">0</span>  ||  more_categories);</span><br><span class="line"></span><br><span class="line">    objc_autoreleasePoolPop(pool);</span><br><span class="line"></span><br><span class="line">    loading = <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>同样的，这个函数的作用就是调用上一步准备好的类和分类中的 <code>+load</code> 方法，并且确保类优先于分类的顺序。我们继续查看在这个函数中调用的另外两个关键函数 <code>static void call_class_loads(void)</code> 和 <code>static BOOL call_category_loads(void)</code> 。由于这两个函数的作用大同小异，下面就以篇幅较小的 <code>static void call_class_loads(void)</code> 函数为例进行探讨。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">call_class_loads</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="comment">// Detach current loadable list.</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">loadable_class</span> *<span class="title">classes</span> = <span class="title">loadable_classes</span>;</span></span><br><span class="line">    <span class="keyword">int</span> used = loadable_classes_used;</span><br><span class="line">    <span class="comment">// 从全局变量 loadable_classes 中取出所有可供调用的类，并进行清零操作。</span></span><br><span class="line">    loadable_classes = nil; <span class="comment">//  指向用于保存类信息的内存的首地址</span></span><br><span class="line">    loadable_classes_allocated = <span class="number">0</span>; <span class="comment">// 标识已分配的内存空间大小</span></span><br><span class="line">    loadable_classes_used = <span class="number">0</span>; <span class="comment">// 标识已使用的内存空间大小</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 循环调用所有类的 +load 方法</span></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; used; i++) &#123;</span><br><span class="line">        Class cls = classes[i].cls;</span><br><span class="line">        <span class="keyword">load_method_t</span> load_method = (<span class="keyword">load_method_t</span>)classes[i].method; <span class="comment">//直接使用函数内存地址的方式 (*load_method)(cls, SEL_load); 对 +load 方法进行调用的</span></span><br><span class="line">        <span class="keyword">if</span> (!cls) <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (PrintLoading) &#123;</span><br><span class="line">            _objc_inform(<span class="string">"LOAD: +[%s load]\n"</span>, cls-&gt;nameForLogging());</span><br><span class="line">        &#125;</span><br><span class="line">        (*load_method)(cls, SEL_load);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Destroy the detached list.</span></span><br><span class="line">    <span class="keyword">if</span> (classes) _free_internal(classes);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个函数就是真正的负责调用类的 +load 方法。</p>
+<p><strong>+initialize 方法</strong><br>
+打开文件 <a href="http://objc-runtime-new.mm" target="_blank" rel="noopener">objc-runtime-new.mm</a> ，找到以下函数：</p>
+<figure class="highlight cal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">IMP lookUpImpOrForward(Class cls, SEL sel, id inst,</span><br><span class="line">                       bool initialize, bool cache, bool resolver)</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">        rwlock_unlock_write(&amp;runtimeLock);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">   </span><br><span class="line">    <span class="keyword">if</span> (initialize  &amp;&amp;  !cls-&gt;isInitialized()) &#123;</span><br><span class="line">        _class_initialize (_class_getNonMetaClass(cls, inst));</span><br><span class="line">        // <span class="keyword">If</span> sel == initialize, _class_initialize will send +initialize <span class="keyword">and</span> </span><br><span class="line">        // <span class="keyword">then</span> the messenger will send +initialize again after this </span><br><span class="line">        // <span class="function"><span class="keyword">procedure</span> <span class="title">finishes</span>. <span class="title">Of</span> <span class="title">course</span>, <span class="title">if</span> <span class="title">this</span> <span class="title">is</span> <span class="title">not</span> <span class="title">being</span> <span class="title">called</span> </span></span><br><span class="line"><span class="function">        <span class="comment">// from the messenger then it won't happen. 2778172</span></span></span><br><span class="line"><span class="function">    &#125;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">    <span class="comment">// The lock is held to make method-lookup + cache-fill atomic </span></span></span><br><span class="line"><span class="function">    <span class="comment">// with respect to method addition. Otherwise, a category could </span></span></span><br><span class="line"><span class="function">    ...</span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>当我们给某个类发送消息时，runtime 会调用这个函数在类中查找相应方法的实现或进行消息转发。当类没有初始化时 runtime 会调用 <code>void _class_initialize(Class cls)</code> 函数对该类进行初始化，函数如下：</p>
+<figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">void _class_initialize(Class cls)</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    Class supercls;</span><br><span class="line">    BOOL reallyInitialize = NO;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 对入参的父类进行递归调用，以确保父类优先于子类初始化</span></span><br><span class="line">    <span class="function"><span class="title">supercls</span> = cls-&gt;</span>superclass;</span><br><span class="line">    <span class="function"><span class="title">if</span> (supercls  &amp;&amp;  !supercls-&gt;</span>isInitialized()) &#123;</span><br><span class="line">        _class_initialize(supercls);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Try to atomically set CLS_INITIALIZING.</span></span><br><span class="line">    monitor_enter(&amp;classInitLock);</span><br><span class="line">    <span class="function"><span class="title">if</span> (!cls-&gt;</span><span class="function"><span class="title">isInitialized</span>() &amp;&amp; !cls-&gt;</span>isInitializing()) &#123;</span><br><span class="line">        <span class="function"><span class="title">cls</span>-&gt;</span>setInitializing();</span><br><span class="line">        reallyInitialize = YES;</span><br><span class="line">    &#125;</span><br><span class="line">    monitor_exit(&amp;classInitLock);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (reallyInitialize) &#123;</span><br><span class="line">        <span class="comment">// We successfully set the CLS_INITIALIZING bit. Initialize the class.</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// Record that we're initializing this class so we can message it.</span></span><br><span class="line">        _setThisThreadIsInitializingClass(cls);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Send the +initialize message.</span></span><br><span class="line">        <span class="comment">// Note that +initialize is sent to the superclass (again) if </span></span><br><span class="line">        <span class="comment">// this class doesn't implement +initialize. 2157218</span></span><br><span class="line">        <span class="keyword">if</span> (PrintInitializing) &#123;</span><br><span class="line">            _objc_inform(<span class="string">"INITIALIZE: calling +[%s initialize]"</span>,</span><br><span class="line">                         <span class="function"><span class="title">cls</span>-&gt;</span>nameForLogging());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// runtime 使用了发送消息 objc_msgSend 的方式对 +initialize 方法进行调用</span></span><br><span class="line">        <span class="comment">// 如果子类没有实现 +initialize 方法，那么继承自父类的实现会被调用；</span></span><br><span class="line">        <span class="comment">// 如果一个类的分类实现了 +initialize 方法，那么就会对这个类中的实现造成覆盖</span></span><br><span class="line">        ((void(*)(Class, SEL))objc_msgSend)(cls, SEL_initialize);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (PrintInitializing) &#123;</span><br><span class="line">            _objc_inform(<span class="string">"INITIALIZE: finished +[%s initialize]"</span>,</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3><span id="总结">总结</span></h3>
+<p>建议大家从 runtime 源码 出发，去具体了解一下 +load 和 +initialize 方法实现的细节，明白它们的调用机制。通过一张表，我们来总结一下这篇文章。</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>+load</th>
+<th>+initialize</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>调用时机</td>
+<td>被添加到 runtime 时</td>
+<td>收到第一条消息前，可能永远不调用</td>
+</tr>
+<tr>
+<td>调用顺序</td>
+<td>父类-&gt;子类-&gt;分类</td>
+<td>父类-&gt;子类</td>
+</tr>
+<tr>
+<td>调用次数</td>
+<td>1次</td>
+<td>多次</td>
+</tr>
+<tr>
+<td>是否需要显式调用父类实现</td>
+<td>否</td>
+<td>否</td>
+</tr>
+<tr>
+<td>是否沿用父类的实现</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>分类中的实现</td>
+<td>类和方法都执行</td>
+<td>覆盖类中的方法，只执行分类的实现</td>
+</tr>
+</tbody>
+</table>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2018/03/18/UIView-与-CALayer的学习/" data-toggle="tooltip" data-placement="top" title="UIView 与 CALayer的学习">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2018/03/13/RunLoop的深入学习/" data-toggle="tooltip" data-placement="top" title="RunLoop的深入学习">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">load 和 initialize 的共同特点</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">load 方法</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">initialize 方法</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">从源码学习 load 和 initialize</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">总结</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="http://beantech.org" target="_blank">Bean Tech</a></li>
+                    
+                        <li><a href="http://blog.kaijun.rocks" target="_blank">Kaijun&#39;s Blog</a></li>
+                    
+                        <li><a href="http://huangxuan.me" target="_blank">Hux Blog</a></li>
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "https://puqin2333.github.io/2018/03/15/Objective-C-中-load-和-initialize-方法/";
+    var disqus_url = "https://puqin2333.github.io/2018/03/15/Objective-C-中-load-和-initialize-方法/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/puqin.chen">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="http://weibo.com/5720008246">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/puqin2333">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; Puqin Chen 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://beantech.org">BeanTech</a> | 
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://puqin2333.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="https://puqin2333.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
