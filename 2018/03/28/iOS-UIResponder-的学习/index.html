@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          About - 普帅同学的博客|puqin’s blog
+          iOS UIResponder 的学习 - 普帅同学的博客|puqin’s blog
         
     </title>
 
-    <link rel="canonical" href="https://puqin2333.github.io/about/">
+    <link rel="canonical" href="https://puqin2333.github.io/2018/03/28/iOS-UIResponder-的学习/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -69,8 +69,8 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('/img/header_img/archive-bg.png')
-            /*page*/
+            background-image: url('null')
+            /*post*/
         
     }
     
@@ -87,10 +87,18 @@
             <div class="row">
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 
-                    <div class="site-heading">
-                        <h1>About</h1>
-                        <!--<hr class="small">-->
-                        <span class="subheading">我永远都没有长大，但我永远都没有停止生长</span>
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
+                            
+                        </div>
+                        <h1>iOS UIResponder 的学习</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by Puqin Chen on
+                            2018-03-28
+                        </span>
                     </div>
                 
 
@@ -193,196 +201,181 @@
 
 
     <!-- Main Content -->
-    <!-- Main Content -->
-<div class="container">
-    <div class="row">
-        
+    <!-- Modify by Yu-Hsuan Yen -->
 
-<!-- USE SIDEBAR -->
-    <!-- Post Container -->
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
             <div class="
-                col-lg-8 col-lg-offset-1
-                col-md-8 col-md-offset-1
-                col-sm-12
-                col-xs-12
-                post-container
-            ">
-            
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
                 <blockquote>
-<p>悲伤的人，一杯敬往生的荒唐，一杯敬当下的苟且，一杯敬明日的远方<br>
-欢快的人，一杯敬过往的芳华，一杯敬眼前的享乐，一杯敬未来的美幻</p>
+<p>UIView 的指责之一是处理事件，一个视图是一个事件响应者，可以处理点击等事件。而这些事件就是在 UIResponder 类中定义的。</p>
 </blockquote>
+<p>一个 UIResponder 类为那些需要响应并处理事件的对象定义了一组接口。这些事件主要分为两类：触摸事件和运动事件。</p>
+<p>在 UIKit 中，UIApplication、UIView、UIViewController 这几个类都是直接继承自 UIResponder 类。这些对象都有响应事件的能力，因此也被称为响应对象，或者响应者。</p>
+<h2><span id="响应链">响应链</span></h2>
+<p>大多数事件的分发都是依赖响应链的。响应链是由一系列链接在一起的响应者组成的。一般，一条响应链开始于第一响应者，结束于 application 对象。如果一个响应者不能处理事件，则会将事件沿着响应链传到下一响应者。</p>
+<h3><span id="构建响应链">构建响应链</span></h3>
+<p>在 APP 中，所有的视图都是按树状层次结构组织起来的。除了根视图，每个视图都有一个父视图，也可以有多个或0个子视图，由此就构成了一条条的事件响应链。</p>
+<h3><span id="确定第一响应者">确定第一响应者</span></h3>
+<ol>
+<li>当用户触发某一事件后，UIKit 会创建一个事件对象（UIEvent），然后事件对象被放到一个事件队列中（队列按照FIFO处理事件）。</li>
+<li>当处理事件时，程序的UIApplication 对象会从队列的头部取出一个事件对象，并将其分发出去。</li>
+<li>通常首先是将事件分发给程序的主UIWindow对象，对于触摸事件来说，window 会尝试将事件分发给触摸事件发生的那个视图上（被称为hit-test视图），查找的过程就是 hit-testing。</li>
+<li>系统使用 hit-testing 来找到触摸下的视图，它检测一个触摸事件是否发生在相应视图对象的边界内（即视图的frame）。如果在，则会递归检测其所在的子视图。包含触摸点的视图层次架构中最底层的视图就是 hit-test 视图。在检测出 hit-test 后，系统就会将事件发送给这个视图来进行处理。</li>
+</ol>
+<p>hit-test视图可以最先去处理触摸事件，如果hit-test视图不能处理事件，则事件会沿着响应链往上传递，直到找到能处理它的视图。</p>
+<h3><span id="事件传递">事件传递</span></h3>
+<p>最先可以处理事件的对象就是 hit-test 视图或第一响应者。如果这两者都不能处理，UIKit 会将事件传递到响应链中的下一个响应者。每一个响应者确定其是否要处理事件或者是通过nextResponder方法将其传递给下一个响应者。这一过程一直持续到找到能处理事件的响应者对象或者最终没有找到响应者。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/692194-d52881fec2a301f8.png?imageMogr2/auto-orient/strip%7CimageView2/2" alt="响应链"></p>
 
-
-                <!-- 如果开启评论功能 -->
                 
-                    <hr>
 
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
                     
+                    
+                        <li class="next">
+                            <a href="/2018/03/25/iOS-多线程之NSOperation、NSOperationQueue/" data-toggle="tooltip" data-placement="top" title="iOS 多线程之NSOperation、NSOperationQueue">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
 
-                    
-                    <!-- disqus 评论框 start -->
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
                     <div class="comment">
                         <div id="disqus_thread" class="disqus-thread"></div>
                     </div>
-                    <!-- disqus 评论框 end -->
-                    
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
 
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">响应链</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">构建响应链</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">确定第一响应者</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.3.</span> <span class="toc-nav-text">事件传递</span></a></li></ol></li></ol>
+        
+        </div>
+      </aside>
+    
 
-                    
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
 
-                    
-                    <!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
-                    <script type="text/javascript">
-                        /* * * CONFIGURATION VARIABLES * * */
-                        var disqus_shortname = "your-disqus-ID";
-                        var disqus_identifier = "https://puqin2333.github.io/about/index.html";
-                        var disqus_url = "https://puqin2333.github.io/about/index.html";
-
-                        (function() {
-                            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-                            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                        })();
-
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
                         
-                    </script>
-                    <!-- disqus 公共JS代码 end -->
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
                     
+                        <li><a href="http://beantech.org" target="_blank">Bean Tech</a></li>
+                    
+                        <li><a href="http://blog.kaijun.rocks" target="_blank">Kaijun&#39;s Blog</a></li>
+                    
+                        <li><a href="http://huangxuan.me" target="_blank">Hux Blog</a></li>
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
                 
             </div>
-
-          <!-- Sidebar Container -->
-<div class="
-    col-lg-3 col-lg-offset-0
-    col-md-3 col-md-offset-0
-    col-sm-12
-    col-xs-12
-    sidebar-container
-">
-    
-        <!-- Featured Tags -->
-
-<section>
-    <!-- no hr -->
-    <h5><a href="/tags/">FEATURED TAGS</a></h5>
-    <div class="tags">
-        
-            
-            <a href="/tags/#计算机网络" title="计算机网络" rel="2">计算机网络</a>
-            
-        
-            
-        
-            
-            <a href="/tags/#iOS" title="iOS" rel="9">iOS</a>
-            
-        
-            
-        
+        </div>
     </div>
-</section>
+</article>
 
-        <hr>
-    
-        <!-- Short About -->
-<section class="visible-md visible-lg">
-    <h5><a href="/about/">ABOUT ME</a></h5>
-    <div class="short-about">
 
-        
-            <img id = "avatar_pic" src="/img/iconman.png" />
-        
 
-        
-            <p>写写代码、聊聊人生、谈谈未来</p>
-        
 
-        <!-- SNS Link -->
-        <ul class="list-inline">
-            
-            
-            
-                <li>
-                    <a target="_blank" href="https://www.zhihu.com/people/puqin.chen">
-                        <span class="fa-stack fa-lg">
-                            <i class="fa fa-circle fa-stack-2x"></i>
-                            <i class="fa  fa-stack-1x fa-inverse">知</i>
-                        </span>
-                    </a>
-                </li>
-            
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "https://puqin2333.github.io/2018/03/28/iOS-UIResponder-的学习/";
+    var disqus_url = "https://puqin2333.github.io/2018/03/28/iOS-UIResponder-的学习/";
 
-            
-                <li>
-                    <a target="_blank" href="http://weibo.com/5720008246">
-                        <span class="fa-stack fa-lg">
-                            <i class="fa fa-circle fa-stack-2x"></i>
-                            <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
-                        </span>
-                    </a>
-                </li>
-            
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
 
-            
 
-            
-                <li>
-                    <a target="_blank"  href="https://github.com/puqin2333">
-                        <span class="fa-stack fa-lg">
-                            <i class="fa fa-circle fa-stack-2x"></i>
-                            <i class="fa fa-github fa-stack-1x fa-inverse"></i>
-                        </span>
-                    </a>
-                </li>
-            
-            
-            
-            
-        </ul>
-    </div>
-</section>
-        <hr>
-    
-        
-  <h5>RECENT POSTS</h3>
-  <div class="widget">
-    <ul>
-      
-        <li>
-          <a href="/2018/03/28/iOS-UIResponder-的学习/">iOS UIResponder 的学习</a>
-        </li>
-      
-        <li>
-          <a href="/2018/03/25/iOS-多线程之NSOperation、NSOperationQueue/">iOS 多线程之NSOperation、NSOperationQueue</a>
-        </li>
-      
-        <li>
-          <a href="/2018/03/18/UIView-与-CALayer的学习/">UIView 与 CALayer的学习</a>
-        </li>
-      
-        <li>
-          <a href="/2018/03/15/Objective-C-中-load-和-initialize-方法/">Objective-C 中 load 和 initialize 方法</a>
-        </li>
-      
-        <li>
-          <a href="/2018/03/13/RunLoop的深入学习/">RunLoop的深入学习</a>
-        </li>
-      
-    </ul>
-  </div>
 
-        <hr>
-    
-        <!-- Categories -->
 
-        <hr>
-    
-</div>
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
 
-        
-    </div>
-</div>
 
 
     <!-- Footer -->
