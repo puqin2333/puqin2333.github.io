@@ -136,14 +136,14 @@
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
@@ -210,6 +210,42 @@
             
                 <!-- Main Content -->
 
+
+<div class="post-preview">
+
+    <a href="/2018/03/30/Charles-抓包分析/">
+        <h2 class="post-title">
+            Charles 抓包分析
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            
+Charles 是在Mac下常用的截取网络封包的工具，在做iOS开发时，我们为了调试与服务器端的网络通讯协议，常常需要截取网络封包来分析。Charles通过将自己设置成系统的网络访问代理服务器，使得所有的网络访问请求都通过它来完成，从而实现了网络封包的截取和分析。
+
+使用 Charles 抓包的过程
+http 抓包
+对于 mac
+在 mac 下进行 http 抓包，非常简单，只要打开 Ch......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by Puqin Chen on
+            2018-03-30
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#工具" title="工具">工具</a>
+            
+              <a href="/tags/#计算机网络" title="计算机网络">计算机网络</a>
+            
+        </div>
+    
+
+</div>
+<hr>
 
 <div class="post-preview">
 
@@ -505,40 +541,6 @@ TCP/IP协议分层模型
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/2018/03/05/“KVC-KVO的使用以及实现原理”/">
-        <h2 class="post-title">
-            “KVC/KVO的使用以及实现原理”
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            概念
-
-
-KVC ： 即 Key-Value-Coding，用于键值编码。作为 cocoa 的一个标准化组成部分，它是基于 NSKeyValueCoding 非正式协议的机制。简单来说，就是直接通过 key  值对对象的属性进行存取操作，而不需要调用明确的存取方法（set 和 get 方法 ）。基本上所有的 OC 对象都支持 KVC。
-
-
-KVO ： 即 Key-Value-Observin......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by Puqin Chen on
-            2018-03-05
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#iOS" title="iOS">iOS</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
@@ -575,9 +577,11 @@ KVO ： 即 Key-Value-Observin......
     <div class="tags">
         
             
-            <a href="/tags/#计算机网络" title="计算机网络" rel="2">计算机网络</a>
+            <a href="/tags/#工具" title="工具" rel="2">工具</a>
             
         
+            
+            <a href="/tags/#计算机网络" title="计算机网络" rel="3">计算机网络</a>
             
         
             
@@ -656,6 +660,10 @@ KVO ： 即 Key-Value-Observin......
     <ul>
       
         <li>
+          <a href="/2018/03/30/Charles-抓包分析/">Charles 抓包分析</a>
+        </li>
+      
+        <li>
           <a href="/2018/03/28/iOS-UIResponder-的学习/">iOS UIResponder 的学习</a>
         </li>
       
@@ -669,10 +677,6 @@ KVO ： 即 Key-Value-Observin......
       
         <li>
           <a href="/2018/03/15/Objective-C-中-load-和-initialize-方法/">Objective-C 中 load 和 initialize 方法</a>
-        </li>
-      
-        <li>
-          <a href="/2018/03/13/RunLoop的深入学习/">RunLoop的深入学习</a>
         </li>
       
     </ul>

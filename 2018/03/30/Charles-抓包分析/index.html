@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          iOS UIResponder 的学习 - 普帅同学的博客|puqin’s blog
+          Charles 抓包分析 - 普帅同学的博客|puqin’s blog
         
     </title>
 
-    <link rel="canonical" href="https://puqin2333.github.io/2018/03/28/iOS-UIResponder-的学习/">
+    <link rel="canonical" href="https://puqin2333.github.io/2018/03/30/Charles-抓包分析/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -90,14 +90,16 @@
                     <div class="post-heading">
                         <div class="tags">
                             
-                              <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
+                              <a class="tag" href="/tags/#工具" title="工具">工具</a>
+                            
+                              <a class="tag" href="/tags/#计算机网络" title="计算机网络">计算机网络</a>
                             
                         </div>
-                        <h1>iOS UIResponder 的学习</h1>
+                        <h1>Charles 抓包分析</h1>
                         <h2 class="subheading"></h2>
                         <span class="meta">
                             Posted by Puqin Chen on
-                            2018-03-28
+                            2018-03-30
                         </span>
                     </div>
                 
@@ -215,25 +217,56 @@
                 post-container">
 
                 <blockquote>
-<p>UIView 的指责之一是处理事件，一个视图是一个事件响应者，可以处理点击等事件。而这些事件就是在 UIResponder 类中定义的。</p>
+<p>Charles 是在Mac下常用的截取网络封包的工具，在做iOS开发时，我们为了调试与服务器端的网络通讯协议，常常需要截取网络封包来分析。Charles通过将自己设置成系统的网络访问代理服务器，使得所有的网络访问请求都通过它来完成，从而实现了网络封包的截取和分析。</p>
 </blockquote>
-<p>一个 UIResponder 类为那些需要响应并处理事件的对象定义了一组接口。这些事件主要分为两类：触摸事件和运动事件。</p>
-<p>在 UIKit 中，UIApplication、UIView、UIViewController 这几个类都是直接继承自 UIResponder 类。这些对象都有响应事件的能力，因此也被称为响应对象，或者响应者。</p>
-<h2><span id="响应链">响应链</span></h2>
-<p>大多数事件的分发都是依赖响应链的。响应链是由一系列链接在一起的响应者组成的。一般，一条响应链开始于第一响应者，结束于 application 对象。如果一个响应者不能处理事件，则会将事件沿着响应链传到下一响应者。</p>
-<h3><span id="构建响应链">构建响应链</span></h3>
-<p>在 APP 中，所有的视图都是按树状层次结构组织起来的。除了根视图，每个视图都有一个父视图，也可以有多个或0个子视图，由此就构成了一条条的事件响应链。</p>
-<h3><span id="确定第一响应者">确定第一响应者</span></h3>
+<h2><span id="使用-charles-抓包的过程">使用 Charles 抓包的过程</span></h2>
+<h3><span id="http-抓包">http 抓包</span></h3>
+<p><strong>对于 mac</strong><br>
+在 mac 下进行 http 抓包，非常简单，只要打开 Charles 设置代理以后，就可以抓取 Mac 上的网络请求了。<br>
+<img src="https://upload-images.jianshu.io/upload_images/2525930-173a9e6af7bc4e75.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700" alt="image"></p>
+<p><strong>对于 iOS 设备：</strong></p>
 <ol>
-<li>当用户触发某一事件后，UIKit 会创建一个事件对象（UIEvent），然后事件对象被放到一个事件队列中（队列按照FIFO处理事件）。</li>
-<li>当处理事件时，程序的UIApplication 对象会从队列的头部取出一个事件对象，并将其分发出去。</li>
-<li>通常首先是将事件分发给程序的主UIWindow对象，对于触摸事件来说，window 会尝试将事件分发给触摸事件发生的那个视图上（被称为hit-test视图），查找的过程就是 hit-testing。</li>
-<li>系统使用 hit-testing 来找到触摸下的视图，它检测一个触摸事件是否发生在相应视图对象的边界内（即视图的frame）。如果在，则会递归检测其所在的子视图。包含触摸点的视图层次架构中最底层的视图就是 hit-test 视图。在检测出 hit-test 后，系统就会将事件发送给这个视图来进行处理。</li>
+<li>在 Mac 中打开Charles 应用</li>
+<li>设置手机 HTTP 代理：确保移动设备与 Mac 笔记本在同一局域网内，添加代理 ip地址（Mac内网地址）和端口号（8888）</li>
+<li>在 iOS 设备上访问接口数据，在 Charles 弹出的确认窗口中选择 Allow，允许即可。</li>
 </ol>
-<p>hit-test视图可以最先去处理触摸事件，如果hit-test视图不能处理事件，则事件会沿着响应链往上传递，直到找到能处理它的视图。</p>
-<h3><span id="事件传递">事件传递</span></h3>
-<p>最先可以处理事件的对象就是 hit-test 视图或第一响应者。如果这两者都不能处理，UIKit 会将事件传递到响应链中的下一个响应者。每一个响应者确定其是否要处理事件或者是通过nextResponder方法将其传递给下一个响应者。这一过程一直持续到找到能处理事件的响应者对象或者最终没有找到响应者。</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/692194-d52881fec2a301f8.png?imageMogr2/auto-orient/strip%7CimageView2/2" alt="响应链"></p>
+<h3><span id="https-抓包">https 抓包</span></h3>
+<p><strong>对于 mac</strong></p>
+<ol>
+<li>安装 Charles 证书：浏览器访问地址 <a href="http://www.charlesproxy.com/getssl" target="_blank" rel="noopener">http://www.charlesproxy.com/getssl</a> ，浏览器会下载证书并提示安装</li>
+<li>安装完成后，在 Charles 中选择需要代理地址，选中 Enable SSL Proxying，这样就可以抓取 HTTPS 数据包</li>
+</ol>
+<p><strong>对于 iOS</strong></p>
+<ol>
+<li>在 设置好手机 http 代理的前提下， 安装 SSL 证书到手机设备，点击 Help -&gt; SSL Proxying -&gt; Install Charles Root Certificate on a Mobile Device</li>
+<li>出现弹窗得到地址 <a href="http://chls.pro/ssl" target="_blank" rel="noopener">chls.pro/ssl</a> ，然后在手机浏览器上输入地址  <a href="http://chls.pro/ssl" target="_blank" rel="noopener">chls.pro/ssl</a> ，出现证书安装页面，点击安装手机设置有密码的输入密码进行安装<br>
+<img src="https://upload-images.jianshu.io/upload_images/2525930-7d1b48bb772cd066.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700" alt="image"></li>
+<li>Charless 设置 Proxy，进行 Proxy-&gt; SSL Proxying Settings ,勾选 Enable SSL proxying，点击 Add,设置要抓取的https接口</li>
+<li>进行 Https 抓包</li>
+</ol>
+<p>注； 有些 app 对接口内容进行了加密，看到的还是一堆乱码</p>
+<h2><span id="charles-抓包原理">Charles 抓包原理</span></h2>
+<p>Charles 本身就是一个协议代理工具，如果只是普通的HTTP请求，因为数据本身没有经过再次加密，因此作为代理可以知道所有客户端发送到服务端的请求内容以及服务端返回给客户端的数据内容，这也就是抓包工具能够将数据传输内容直接展现出来的原因。</p>
+<p>但是对于 HTTPS 请求，它发送的数据都进行了加密，代理如果什么都不做的话是无法获取到其中的内容的。为了实现这个过程的数据获取， Charles 需要做的事情是对客户端伪装成服务端，对服务端伪装成客户端，具体：</p>
+<ul>
+<li>截获真实客户端的HTTPS请求，伪装客户端向真实服务端发送HTTPS请求</li>
+<li>接受真实服务器响应，用Charles自己的证书伪装服务端向真实客户端发送数据内容</li>
+</ul>
+<p>下图是整个过程：<br>
+<img src="https://upload-images.jianshu.io/upload_images/2438937-a453e3e411efcae5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700" alt="image"></p>
+<p>具体步骤如下：</p>
+<ol>
+<li>客户端向服务器发起 HTTPS 请求</li>
+<li>Charles 拦截客户端的请求，伪装成客户端向服务器进行请求</li>
+<li>服务器向“客户端”（实际上是 Charles）返回服务器的CA证书</li>
+<li>Charles 拦截服务器的响应，获取服务器证书公钥，然后自己制作一张证书，将服务器证书替换后发送给客户端。（这一步，Charles拿到了服务器证书的公钥）</li>
+<li>客户端接收到“服务器”（实际上是Charles）的证书后，生成一个对称密钥，用Charles的公钥加密，发送给“服务器”（Charles）</li>
+<li>Charles拦截客户端的响应，用自己的私钥解密对称密钥，然后用服务器证书公钥加密，发送给服务器。（这一步，Charles拿到了对称密钥）</li>
+<li>服务器用自己的私钥解密对称密钥，向“客户端”（Charles）发送响应</li>
+<li>Charles拦截服务器的响应，替换成自己的证书后发送给客户端</li>
+<li>至此，连接建立，Charles拿到了 服务器证书的公钥 和 客户端与服务器协商的对称密钥，之后就可以解密或者修改加密的报文了。</li>
+</ol>
+<p>简单来说，就是Charles作为“中间人代理”，拿到了 服务器证书公钥 和 HTTPS连接的对称密钥，前提是客户端选择信任并安装Charles的CA证书，否则客户端就会“报警”并中止连接。</p>
 
                 
 
@@ -241,13 +274,9 @@
                 <!-- Pager -->
                 <ul class="pager">
                     
-                        <li class="previous">
-                            <a href="/2018/03/30/Charles-抓包分析/" data-toggle="tooltip" data-placement="top" title="Charles 抓包分析">&larr; Previous Post</a>
-                        </li>
-                    
                     
                         <li class="next">
-                            <a href="/2018/03/25/iOS-多线程之NSOperation、NSOperationQueue/" data-toggle="tooltip" data-placement="top" title="iOS 多线程之NSOperation、NSOperationQueue">Next Post &rarr;</a>
+                            <a href="/2018/03/28/iOS-UIResponder-的学习/" data-toggle="tooltip" data-placement="top" title="iOS UIResponder 的学习">Next Post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -277,7 +306,7 @@
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">响应链</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">构建响应链</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">确定第一响应者</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.3.</span> <span class="toc-nav-text">事件传递</span></a></li></ol></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">使用 Charles 抓包的过程</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">http 抓包</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">https 抓包</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">Charles 抓包原理</span></a></li></ol>
         
         </div>
       </aside>
@@ -297,7 +326,9 @@
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
-                          <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
+                          <a class="tag" href="/tags/#工具" title="工具">工具</a>
+                        
+                          <a class="tag" href="/tags/#计算机网络" title="计算机网络">计算机网络</a>
                         
                     </div>
                 </section>
@@ -332,8 +363,8 @@
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES * * */
     var disqus_shortname = "your-disqus-ID";
-    var disqus_identifier = "https://puqin2333.github.io/2018/03/28/iOS-UIResponder-的学习/";
-    var disqus_url = "https://puqin2333.github.io/2018/03/28/iOS-UIResponder-的学习/";
+    var disqus_identifier = "https://puqin2333.github.io/2018/03/30/Charles-抓包分析/";
+    var disqus_url = "https://puqin2333.github.io/2018/03/30/Charles-抓包分析/";
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
