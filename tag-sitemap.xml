@@ -9,13 +9,6 @@
     </url>
 
     <url>
-        <loc>https://puqin2333.github.io/tags/iOS/</loc>
-        <lastmod>2018-03-28T15:12:19.085Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://puqin2333.github.io/tags/%E5%B7%A5%E5%85%B7/</loc>
         <lastmod>2018-03-30T15:02:46.566Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -25,6 +18,13 @@
     <url>
         <loc>https://puqin2333.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</loc>
         <lastmod>2018-03-30T15:02:46.566Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://puqin2333.github.io/tags/iOS/</loc>
+        <lastmod>2018-04-02T15:07:03.238Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

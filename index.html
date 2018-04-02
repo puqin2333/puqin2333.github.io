@@ -136,14 +136,14 @@
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -210,6 +210,39 @@
             
                 <!-- Main Content -->
 
+
+<div class="post-preview">
+
+    <a href="/2018/04/02/weak-的实现原理/">
+        <h2 class="post-title">
+            weak 的实现原理
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            
+只要学过 iOS 的人，都会对 strong、weak、copy等关键字应该都会很熟悉。weak 属性关键字就是弱引用，它不会增加引用计数但却能保证指针的安全访问，在对象释放后置为 nil，从而避免错误的内存访问。主要为了解决循环引用的问题。
+
+但很少有人知道weak表其实是一个hash表，key是所指对象的地址，Value是 weak 指针的地址数组。
+weak 实现原理的过程
+Runt......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by Puqin Chen on
+            2018-04-02
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#iOS" title="iOS">iOS</a>
+            
+        </div>
+    
+
+</div>
+<hr>
 
 <div class="post-preview">
 
@@ -509,38 +542,6 @@ iOS 应用程序的启动执行顺序
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/2018/03/06/TCP-IP-协议学习笔记/">
-        <h2 class="post-title">
-            TCP/IP 协议学习笔记
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            
-一般来说，TCP/IP 是利用IP进行通信时所必须用到的协议群的统称。具体点，IP或ICMP、TCP或UDP、TELENT或ETP、以及HTTP等都属于TCP/IP协议，而TCP/IP泛指这些协议。
-
-TCP/IP协议分层模型
-网络协议通常分为不同层次进行开发，每一层分别负责不同的通信功能。一个协议族，比如TCP/IP，是一组不同层次上的多个协议的组合。TCP/IP通常被认为是一个四层协议......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by Puqin Chen on
-            2018-03-06
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#计算机网络" title="计算机网络">计算机网络</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
@@ -585,7 +586,7 @@ TCP/IP协议分层模型
             
         
             
-            <a href="/tags/#iOS" title="iOS" rel="9">iOS</a>
+            <a href="/tags/#iOS" title="iOS" rel="10">iOS</a>
             
         
             
@@ -660,6 +661,10 @@ TCP/IP协议分层模型
     <ul>
       
         <li>
+          <a href="/2018/04/02/weak-的实现原理/">weak 的实现原理</a>
+        </li>
+      
+        <li>
           <a href="/2018/03/30/Charles-抓包分析/">Charles 抓包分析</a>
         </li>
       
@@ -673,10 +678,6 @@ TCP/IP协议分层模型
       
         <li>
           <a href="/2018/03/18/UIView-与-CALayer的学习/">UIView 与 CALayer的学习</a>
-        </li>
-      
-        <li>
-          <a href="/2018/03/15/Objective-C-中-load-和-initialize-方法/">Objective-C 中 load 和 initialize 方法</a>
         </li>
       
     </ul>
