@@ -153,14 +153,14 @@
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -266,7 +266,154 @@
 <li>当 copy 修饰不可变类型的时候，且使用不可变类型进行赋值，表示浅拷贝，它只是拷贝指针，和strong 修饰一样。</li>
 </ul>
 <h4><span id="7-assign-与-weak-关键字有什么区别">7. assign 与 weak 关键字有什么区别？</span></h4>
-<p>ARC下，assign 和 weak 是很相近的，都表示弱引用。</p>
+<p>ARC下，assign 和 weak 是很相近的，都不会使引用计数增加，都能修饰对象类型，但是 weak 比 assign 多了一个功能就是当属性所指向的对象消失的时候（也就是内存引用计数为0）会自动赋值为 nil ，这样再向 weak 修饰的属性发送消息就不会导致野指针操作crash。assign 经常用来修饰基本数据类型。<br>
+比如，以下代码：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">weak</span>) <span class="keyword">id</span> weakPoint;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">assign</span>) <span class="keyword">id</span> assignPoint;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="keyword">id</span> strongPoint;</span><br><span class="line"></span><br><span class="line"><span class="keyword">self</span>.strongPoint = [<span class="built_in">NSDate</span> date];</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"strong属性：%@"</span>,<span class="keyword">self</span>.strongPoint);</span><br><span class="line"><span class="keyword">self</span>.weakPoint = <span class="keyword">self</span>.strongPoint;</span><br><span class="line"><span class="keyword">self</span>.assignPoint = <span class="keyword">self</span>.strongPoint;</span><br><span class="line"><span class="keyword">self</span>.strongPoint = <span class="literal">nil</span>;</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"weak属性：%@"</span>,<span class="keyword">self</span>.weakPoint);</span><br><span class="line"><span class="comment">//    NSLog(@"assign属性：%@",self.assignPoint);</span></span><br></pre></td></tr></table></figure>
+<p>当程序中的注释被打开时，运行程序有可能会崩溃（有时候不崩溃，你可能需要多运行几次），这是因为当 assign 指针所指向的内存被释放（释放并不等于抹除，只是引用计数为0），不会自动赋值 nil ，这样再引用 self.assignPoint 就会导致野指针操作，如果这个操作发生时内存还没有改变内容，依旧可以输出正确的结果，而如果发生时内存内容被改变了，就会crash。</p>
+<p>因此，在 ARC 下，指针变量一定要用 weak 修饰，只有基本数据类型和结构题需要用 assign,例如 delegate，一定要用 weak 修饰。</p>
+<p>用 weak 关键字修饰一个 id 类型，如以下这段代码。我们将 字符串赋值给这个id类型，接着我们将这个字符串置为 nil，执行这段代码后，我们会发现除了我们释放的 youString 为 nil 外，其他的不为空。这是因为字符字面值永远不会被释放，所以weak 指针还是指向它。</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">__<span class="keyword">strong</span> <span class="built_in">NSString</span> *yourString = <span class="string">@"Your String"</span>; </span><br><span class="line">__<span class="keyword">weak</span> <span class="built_in">NSString</span> *myString = yourString;</span><br><span class="line">yourString = <span class="literal">nil</span>;</span><br><span class="line">__<span class="keyword">unsafe_unretained</span> <span class="built_in">NSString</span> *theirString = myString;</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"%p %@"</span>, yourString, yourString);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"%p %@"</span>, myString, myString);</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"%p %@"</span>, theirString, theirString);</span><br></pre></td></tr></table></figure>
+<h4><span id="8-nonatomic和atomic的区别atomic是绝对的线程安全么为什么如果不是那应该如何实现">8. nonatomic和atomic的区别？atomic是绝对的线程安全么？为什么？如果不是，那应该如何实现？</span></h4>
+<p>nonatiomic ：非原子性属性，能够提高性能但线程不安全；atiomic：原子属性，能保证线程安全，但是却影响性能，它通过加锁来实现访问/赋值的线程安全。<br>
+atomic 不是绝对的线程安全，它只是保证了getter 和 setter 存取方法的线程安全并不能保证整个对象的线程安全。当线程A进行写操作，这时其他线程的读或者写操作会因为该操作而等待。当A线程写完后，B线程继续执行写线程，然后A线程需要读操作时，却获得了在B线程的值，这样就破坏了线程安全。如果有线程C在线程A之前 realease 了该属性，还会导致程序崩溃。<br>
+我们应该通过线程锁来保证线程的安全。</p>
+<h4><span id="9-nscache优于nsdictionary的几点">9. NSCache优于NSDictionary的几点？</span></h4>
+<p>NSCache 是一个类似于集合的容器，即缓存，它存储的是键值对，类似于 NSDictionary 类，我们通常使用缓存来临时存储短时间使用但昂贵的对象。重用这些对象可以优化性能，因为它们的值不需要重新计算。<br>
+当一个键值对在缓存中时，缓存维护了它的一个强引用。存储在 NSCache 中的通用数据类型通常是实现了 NSDiscardableContent 协议的对象。在缓存中存储这类对象是有好处的，因为当不在需要它时，可以丢弃这些内容，以节省内存。默认情况下，缓存中的NSDiscardableContent 对象在其内容被丢弃时，会被移除出缓存。<br>
+NSCache与可变集合的不同点：</p>
+<ul>
+<li>NSCache 类结合了各种自动删除策略，以确保不会占用过多的系统内容；</li>
+<li>NSCache 是线程安全的，我们可以在不同的线程中操作缓存中的对象；</li>
+<li>NSCache 对象不会拷贝 key 对象；</li>
+</ul>
+<h4><span id="10-objective-c-中-instancetype-与-id-类型的异同点">10. Objective-C 中， instancetype 与 id 类型的异同点</span></h4>
+<p>instancetype 与 id ，都可表示某个方法返回的未知类型的 Objective-C 对象。<br>
+在 ARC 环境下，instancetype 用来在编译期确定实例的类型，而使用 id,编译期不会检查类型，运行时检查类型。<br>
+在 MRC 下，instancetype 和 id 一样，不做具体类型检查。</p>
+<p>id 可以作为方法参数传递， instancetype 不能。<br>
+instancetype 可以使那些非关联返回类型的方法返回所在类的类型，而 id 类型只能返回未知类型的对象。</p>
+<p>在自定义初始化或者便利构造方法中尽量使用instancetype 作为返回值类型，保证类型安全，它能够确定对象类型帮编译器更好定位代码问题。</p>
+<h4><span id="11-objective-c-中-self-和-super-的理解以下代码的输出答案是什么">11. Objective-C 中 self 和 super 的理解，以下代码的输出答案是什么？</span></h4>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// class Son : Father  表示当前类为Son, 父类是 Father</span></span><br><span class="line">- (<span class="keyword">id</span>)init &#123;</span><br><span class="line">	<span class="keyword">self</span> = [<span class="keyword">super</span> init];</span><br><span class="line">	<span class="keyword">if</span> (<span class="keyword">self</span>) &#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@"%@"</span>, <span class="built_in">NSStringFromClass</span>([<span class="keyword">self</span> <span class="keyword">class</span>]));</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@"%@"</span>, <span class="built_in">NSStringFromClass</span>([<span class="keyword">super</span> <span class="keyword">class</span>]));</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>两个输出的答案都是 Son.</p>
+<p>在弄清楚答案，我们需要搞懂 self、super 是什么？ <code>[super init]</code> 做了什么？还有我们为什么要 <code>self = [super init]</code>?<br>
+<strong>self、super是什么？</strong>：self 和 super 都是 OC 提供的保留字，self 代表着当前方法的调用者，在 实例方法中， self 代表着“对象”，在类方法中，self 代表着“类”，self 是方法的隐藏的参数变量，指向当前调用方法的对象，另一个隐藏的参数是_cmd，代表当前类方法的 selector。<br>
+super 不是隐藏的参数，它只是一个编译器指示符，和self 是指向的同一个消息接受者，查找方法时，指定方法查找的位置在父类。</p>
+<p><strong>[super init] 做了什么？</strong><br>
+在发送消息时，如</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// class A</span></span><br><span class="line">- （<span class="keyword">void</span>)load &#123;</span><br><span class="line">	····</span><br><span class="line">	[<span class="meta">self message</span>];</span><br><span class="line">	····</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如 <code>A a = [[a alloc] init]</code> 调用 <code>[a load]</code> 方法，编译器会将其中的<code>[self message]</code> 转化为 <code>objc_msgSend(id self, SEL _cmd)</code>。此时，self 指代 a 对象，方法从 a 对应类结构的方法调度表中开始寻找，如果找不到，延继承链往父类中寻找；<br>
+如果 load 是类方法，self 指代A类对象。编译器会将其中的<code>[self message]</code> 转化为 <code>objc_msgSendSuper(struct objc_super *super, SEL op, ...)</code>。<br>
+第一个参数是 objc_super的结构体，第二个参数还是类似上面的类方法 selector，<br>
+首先了解一下 objc_super 这个结构体：</p>
+<figure class="highlight thrift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">objc_super</span> </span>&#123;</span><br><span class="line">	id receiver;	<span class="comment">// 类似于上面 objc_msgSend 的第一个参数 receiver</span></span><br><span class="line">	Class superClass; <span class="comment">// 记录 super 的父类是什么</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>用上面的代码为例，当编译器遇到当编译器遇到 A 里 <code>[super message]</code> 时，开始做这几个事：<br>
+      - 构建 objc_super 的结构体，此时这个结构体的第一个成员变量 receiver 就是 a，和 self 相同。而第二个成员变量 superClass 就是指类 A的 superClass。<br>
+      - 调用 objc_msgSendSuper 的方法，将这个结构体和 message 的 SEL 传递过去。函数里面在做的事情类似这样：从 objc_super 结构体指向的 superClass 的方法列表开始找 message 的 selector，找到后再以 objc_super-&gt;receiver 去调用这个 selector，可能也会使用 objc_msgSend 这个函数，不过此时的第一个参数 theReceiver 就是 objc_super-&gt;receiver，第二个参数是从 objc_super-&gt;superClass 中找到的 selector</p>
+<p><strong>为什么要 self = [super init]</strong><br>
+符合oc 继承类 初始化规范 super 同样也是这样，  <code>[super init]</code>  去 self 的 super 中调用init     super 调用其 super 的 init 。直到根类 NSObject 中的 init ,<br>
+根类中 init 负责初始化内存区域  向里面添加一些必要的属性，返回内存指针，  这样延着继承链初始化的内存指针被从上到下传递，在不同的子类中向块内存添加子类必要的属性，直到我们的 A 类中 得到内存指针，赋值给 slef 参数， 在if (slef){//添加A 的属性 }</p>
+<p>接下来，回到这个问题，为什么打印结果都一样？<br>
+当发送class消息时，不管self和super，其消息主体依然是self,也就是说 self 和 super 指向的是同一个对象。只是查找方法的位置的区别，一个是从本类，一个是从本类的超类。<br>
+一般情况下  class 方法 只有在根类 NSObject 中定义，极少情况有子类重写 class 方法，<br>
+所以 [<code>slef class]</code> 和 <code>[super class]</code>都是在根类中找方法实现， 消息接收主体又都是 a<br>
+自然都打印出  Son</p>
+<h4><span id="12-objective-c-中-load-和-initialize-方法有什么区别">12. Objective-C 中 load 和 initialize 方法有什么区别？</span></h4>
+<p>load 和 initialize 是 NSObject 的两个特殊的类方法，用于类的初始化。它们有很多共同点，比如；</p>
+<ol>
+<li>在不考虑主动调用方法的情况下，系统最多调用一次；</li>
+<li>如果父类和子类都被调用，父类的调用一定在子类之前；</li>
+<li>调用它们都是为了应用运行时提前创建合适的运行环境<br>
+<strong>对于 load 方法：</strong><br>
+load 方法是当类或分类被添加到 Objective-C runtime时被调用，实现这个方法可以让我们在类加载的时候执行一些类的相关行为，具体如下：</li>
+</ol>
+<ul>
+<li>调用时机较早，运行环境有不确定因素；在iOS中，通常就是 APP 启动时进行加载，但当 load 调用的时候，并不能保证所有类都加载完成且可用，必要时还要自己负责做 autorelease 处理。</li>
+<li>对于有依赖关系的两个库中，被依赖的类的load会优先调用。但是在一个库内，调用顺序是不确定的。</li>
+<li>一个类的load方法不会写明[super load] ，父类就会收到调用，并且在子类之前。</li>
+<li>catagory 的 load 也会收到调用，但是顺序在主类的load调用之后。</li>
+<li>不会直接触发 initialize 的调用</li>
+<li>调用类的 load 方法，它是直接使用函数内存地址的方式 (*load_method)(cls, SEL_load); 对 +load 方法进行调用的，而不是使用消息 objc_msgSend 的方式。这种调用方式也就使得子类、分类以及父类的 +load 方法的实现被区别对待了</li>
+</ul>
+<p><strong>对于 initialize 方法</strong><br>
++initialize 方法是在类或者它的子类收到第一条消息之前被调用的，这里所指的消息包括实例方法和类方法的调用。也就是说 + initialize 方法是以懒加载的方式被调用的，如果程序一直没有给某个类或者它的子类发送消息，那么这个类的 + initialize 方法永远不会被调用。这样，可以节省系统资源，避免浪费。具体如下：</p>
+<ul>
+<li>initialize 的自然调用是在第一次主动使用当前类的时候（以懒加载的方式）</li>
+<li>在 initialize 方法收到调用时，运行环境基本健全</li>
+<li>initialize 的运行过程中，是保证线程安全的。</li>
+<li>和 load 不同，即使子类不实现 initialize 方法，会把父类的实现继承过来调用一遍。</li>
+<li>runtime 使用了发送消息 objc_msgSend 的方式对 +initialize 方法进行调用</li>
+</ul>
+<p><a href="https://puqin2333.github.io/2018/03/15/Objective-C-%E4%B8%AD-load-%E5%92%8C-initialize-%E6%96%B9%E6%B3%95/">了解更多</a></p>
+<h4><span id="13-如何令自己所写的对象具有拷贝功能">13. 如何令自己所写的对象具有拷贝功能?</span></h4>
+<p>若想令自己所写的对象具有拷贝功能，则需要实现 NSCopying 协议。如果自定义的对象有可变和不可变类型，那么就需要同时实现 NSCopying 与 NSMutableCopying 协议。</p>
+<p>具体步骤：</p>
+<ol>
+<li>需要先声明该类遵从 NSCopying 协议。</li>
+<li>实现 NSCopying 协议，即 <code>- (id)copyWithZone:(NSZone *)zone;</code></li>
+</ol>
+<h4><span id="14-可变集合类-和-不可变集合类的-copy-和-mutablecopy有什么区别如果是集合是内容复制的话集合里面的元素也是内容复制么">14. 可变集合类 和 不可变集合类的 copy 和 mutablecopy有什么区别？如果是集合是内容复制的话，集合里面的元素也是内容复制么？</span></h4>
+<p>不可变集合类进行 copy之后返回的是不可变集合类，它只是浅复制；不可变集合类进行 mutablecopy 返回的是一个可变的对象，进行了深复制，它们指向的地址不同，内容相同；<br>
+可变集合类进行copy，返回一个不可变对象，进行了深复制；可变集合类进行 mutablecopy 时，返回一个可变的对象，并且进行了深复制。<br>
+对于集合进行内容复制的话，不论是 copy 还是 mutableCopy,对于其内部元素的拷贝只是浅拷贝。<br>
+注意：当使用 copy 修饰一个可变类型时，copy 会复制一个不可变 NSArray 的对象，当添加、删除、修改数组内的元素的时候，程序会因为找不到对应的方法崩溃。<br>
+<a href="https://www.zybuluo.com/MicroCai/note/50592" target="_blank" rel="noopener">了解更多</a></p>
+<h4><span id="15-为什么代理要用-weak-代理的-delegate-和-datasource-有什么区别-block-和代理的区别">15. 为什么代理要用 weak ? 代理的 delegate 和 dataSource 有什么区别？ block 和代理的区别？</span></h4>
+<p>我们定义的指针默认都是 _strong 类型的，strong 类型的指针会造成强引用，必定会影响一个对象的生命周期，这就形成了循环引用。<br>
+<img src="https://upload-images.jianshu.io/upload_images/270478-55bd24c91d59a796.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/644" alt="强引用"></p>
+<p>上图中，由于代理对象使用强引用指针，引用创建的委托方LoginVC对象，并且成为LoginVC的代理。这就会导致LoginVC的delegate属性强引用代理对象，导致循环引用的问题，最终两个对象都无法正常释放。</p>
+<p>我们将LoginVC对象的delegate属性，设置为弱引用属性。这样在代理对象生命周期存在时，可以正常为我们工作，如果代理对象被释放，委托方和代理对象都不会因为内存释放导致的Crash。</p>
+<p>代理的 delegate 侧重于与用户交互的回调；datasource 侧重于数据的回调。</p>
+<p>代理主要由三部分组成：<br>
+	协议： 用来指定代理双方可以做什么，必须做什么，通过 @protocol 实现协议。<br>
+	代理：根据指定的协议，完成委托方需要实现的功能。<br>
+	委托：根据指定的协议，指定代理去完成什么功能。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/270478-fe9f99301735bfba.png?imageMogr2/auto-orient/" alt=""></p>
+<p>协议只能定义公用的一套接口，类似于一个约束代理双方的作用。但不能提供具体的实现方法，实现方法需要代理对象去实现。协议可以继承其他协议，并且可以继承多个协议，在iOS中对象是不支持多继承的，而协议可以多继承。</p>
+<p>协议有两个修饰符@optional和@required，创建一个协议如果没有声明，默认是@required状态的。这两个修饰符只是约定代理是否强制需要遵守协议，如果@required状态的方法代理没有遵守，会报一个黄色的警告，只是起一个约束的作用，没有其他功能。</p>
+<p>在 iOS 中，代理的本质就是代理对象内存的传递和操作，我们在委托类设置代理后，实际上只是用一个 id 类型的指针将代理对象进行了一个弱引用。委托方让代理方执行操作，实际上是在委托类中向这个id类型指针指向的对象发送消息，而这个id类型指针指向的对象，就是代理对象。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/270478-46bd127a39be8f28.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700" alt=""></p>
+<p>通过上图发现，其实委托方的代理属性本质上就是代理对象自身，设置委托代理就是代理属性指针指向代理对象，相当于代理对象只是在委托方调用自己的方法，如果没有实现就会导致崩溃。</p>
+<p><strong>代理和Block的区别：</strong><br>
+上面也详细的介绍了代理，而 Block 就是带截获自动变量的匿名函数，我们也可以使用 block 进行回调。对于，它们的区别，我们还是针对使用场景细说：</p>
+<ol>
+<li>多个消息传递时，应该使用 delegate</li>
+<li>一个委托对象的代理属性只能有一个代理对象，如果想要委托对象回调多个代理对象，应该使用 block.</li>
+<li>代理是可选的，而block 在方法调用的时候只能通过将某个参数传递一个 nil 进去。</li>
+<li>代理更加面向过程，block 则更加面向结果</li>
+<li>从性能上，block 的性能消耗要略大于 delegate ,因为 block 会涉及到栈区向堆区的拷贝等操作，时间和空间上的消耗都大于代理。而代理只是定义了一个方法列表，在遵守协议对象的objc_protocol_list中添加一个节点，在运行时向遵守协议的对象发送消息即可。</li>
+</ol>
+<p><a href="https://www.jianshu.com/p/2113ffe54b30" target="_blank" rel="noopener">关于代理，可以参考</a></p>
+<h3><span id="ios-基础部分">iOS 基础部分</span></h3>
+<h4><span id="ios-中常见的设计模式都有哪些">iOS 中常见的设计模式都有哪些？</span></h4>
+<p>在 iOS 设计模式中，总共有超过二十种的设计模式。我们常用的主要有代理、通知、单例、策略等设计模式。</p>
+<ul>
+<li>代理：简单的来说，就是委托其他帮助自己做事，它为其他对象提供了一种代理，以控制对这个对象的访问。代理模式由三部分组成：协议、委托和代理。iOS 中我们的协议可以是@optional和@required的。</li>
+<li>观察者：常见的比如 KVO、通知，就是一种观察者模式，它定义了对象之间一种一对多的依赖关系。一般，我们对于 model层的数据进行监听，并在不同的界面进行了注册，然后当这个状态发生改变的时候，会通知所有的观察者对象。</li>
+<li>单例模式：单例模式使得类中的一个对象成为系统中的唯一实例，它提供了对对类的对象所提供的资源的全局访问点。因此，需要用一种只允许生成对象类的唯一实例的机制。如系统提供的 UIApplication、NSUserdefault 等都是单例类。</li>
+<li>策略模式：定义了一系列的算法，把它们一个个封装起来，使得它们可以相互替换。它易于理解且易于切换扩展。</li>
+<li>中介者模式：用一个对象来封装一系列对象的交互方式，中介者使各个对象不需要显式的相互作用，从而使得耦合松散，独立的改变它们之间的交互。</li>
+</ul>
+<h4><span id="讲一下你理解的-mvc-和-mvvm-mvp">讲一下你理解的 MVC 和 MVVM、MVP ？</span></h4>
+<p><strong>MVC（模型-视图-控制器）</strong>：Model 层，模型对象，负责封装应用程序的数据，定义操控和处理数据的逻辑和运算；View 层视图对象负责显示来自model 层的数据，并对用户的操作作出响应；Controller 控制器对象在 MVC 设计模式中充当M 层和 V 层交互的媒介，它将来自M层的数据交由V层显示，并将V层的用户操作产生的新的数据或者更改过的数据传达给模型对象。<br>
+在 MVC 中，M 和 V 是不能够直接通信的，只能通过 C 来传递；C 可以直接与 M 层对话，而M层通过通知和KVO机制与C层间接通信；C 也可以直接与V层对话，V层通过 action 向 C层报告事件的发生，C层是V层的直接数据源。C层是V层的代理，以便同步V和C。<br>
+MVC暴露出来的问题：C层的过于臃肿，M层的轻便，以及网络逻辑的归属。<br>
+<strong>MVP（模型-视图控制器-协调器）</strong>：M层与MVC的M相似，都是负责封装数据，用来封装网络请求获取的json数据的集合；V 层可以是 View视图，也可以是viewController等控件；P层，作为M和V的中间人，从M层获取数据之后传给V层，使得V和M没有耦合。<br>
+<strong>MVVM</strong>：MVVM将ViewController视作View，View 层与 ViewModel 之间进行绑定；VM是 UIKit 下的每个控件以及控件的状态。VM调用会改变M的同时将M的改变更新到自身并且在V上更新状态（因为我们绑定了V 和 VM）</p>
+<h4><span id=""></span></h4>
+<h4><span id="ios-中的看门狗机制是什么">iOS 中的看门狗机制是什么？</span></h4>
+<p>为了避免应用陷入错误状态导致界面无响应，Apple 设计了看门狗（WatchDog）机制。一旦超时，强制杀死进程。<br>
+在不同的生命周期，触发看门狗机制的超时时间有所不同。<br>
+看门狗超时崩溃报告：<br>
+<code>异常类型：00000020异常代码：0x8badf00d</code><br>
+在网络应用程序中看门狗超时崩溃的最常见原因是主线程上的同步网络。这里有四个影响因素：</p>
+<ol>
+<li>同步网络： 这是您发出网络请求并阻止等待响应的地方</li>
+<li>主线程：同步网络通常不太理想，但如果在主线程中执行，会导致特定的问题。因为主线程负责运行用户界面，如果你很长时间内阻塞了主线程，用户界面变得无法接受无法响应。</li>
+<li>长时间超时： 如果网络刚刚消失（例如，用户正在进入隧道的列车中），则任何待处理的网络请求都不会失败，直到超时过期。大多数网络超时都是以分钟为单位来衡量的，这意味着主线程上阻塞的同步网络请求可以使用户界面一次不响应数分钟。</li>
+<li>看门狗 - 为了保持用户界面的响应，iOS包含一个看门狗机制。如果您的应用程序无法及时响应某些用户界面事件（启动，挂起，恢复，终止），则看门狗将会终止您的应用程序并生成看门狗超时崩溃报告。监督人员给你的时间没有正式记录，但总是少于网络超时。<br>
+这个问题的一个棘手方面是它高度依赖于网络环境。如果你总是在你的办公室测试你的应用程序，那里的网络连接性好，你永远不会看到这种类型的崩溃。但是，一旦您开始将应用程序部署到最终用户 - 谁将在各种网络环境中运行它 - 这样的崩溃将会变得很普遍。</li>
+</ol>
 
                 
 
@@ -306,7 +453,7 @@
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">iOS 常见面试题（持续更新）</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">Objective-C 基础部分</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.1.</span> <span class="toc-nav-text">1.为什么说 Objective-C 是一门动态的语言？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.2.</span> <span class="toc-nav-text">2. 属性的实质是什么？包括哪几部分？属性默认的关键字有哪些？属性中的 ivar、getter、setter 是如何生成并添加到这个类中？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.3.</span> <span class="toc-nav-text">3. @dynamic 关键字和 @synthesize 关键字是用来做什么的？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.4.</span> <span class="toc-nav-text">4. @synthesize合成实例变量的规则是什么？假如property名为foo，存在一个名为_foo的实例变量，那么还会自动合成新变量么？在有了自动合成属性实例变量之后，@synthesize还有哪些使用场景？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.5.</span> <span class="toc-nav-text">5. Objective-C 的属性关键字都有哪些？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.6.</span> <span class="toc-nav-text">6. NSString为什么要用copy关键字，如果用strong会有什么问题？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.7.</span> <span class="toc-nav-text">7. assign 与 weak 关键字有什么区别？</span></a></li></ol></li></ol></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">iOS 常见面试题（持续更新）</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">Objective-C 基础部分</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.1.</span> <span class="toc-nav-text">1.为什么说 Objective-C 是一门动态的语言？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.2.</span> <span class="toc-nav-text">2. 属性的实质是什么？包括哪几部分？属性默认的关键字有哪些？属性中的 ivar、getter、setter 是如何生成并添加到这个类中？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.3.</span> <span class="toc-nav-text">3. @dynamic 关键字和 @synthesize 关键字是用来做什么的？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.4.</span> <span class="toc-nav-text">4. @synthesize合成实例变量的规则是什么？假如property名为foo，存在一个名为_foo的实例变量，那么还会自动合成新变量么？在有了自动合成属性实例变量之后，@synthesize还有哪些使用场景？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.5.</span> <span class="toc-nav-text">5. Objective-C 的属性关键字都有哪些？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.6.</span> <span class="toc-nav-text">6. NSString为什么要用copy关键字，如果用strong会有什么问题？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.7.</span> <span class="toc-nav-text">7. assign 与 weak 关键字有什么区别？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.8.</span> <span class="toc-nav-text">8. nonatomic和atomic的区别？atomic是绝对的线程安全么？为什么？如果不是，那应该如何实现？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.9.</span> <span class="toc-nav-text">9. NSCache优于NSDictionary的几点？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.10.</span> <span class="toc-nav-text">10. Objective-C 中， instancetype 与 id 类型的异同点</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.11.</span> <span class="toc-nav-text">11. Objective-C 中 self 和 super 的理解，以下代码的输出答案是什么？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.12.</span> <span class="toc-nav-text">12. Objective-C 中 load 和 initialize 方法有什么区别？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.13.</span> <span class="toc-nav-text">13. 如何令自己所写的对象具有拷贝功能?</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.14.</span> <span class="toc-nav-text">14. 可变集合类 和 不可变集合类的 copy 和 mutablecopy有什么区别？如果是集合是内容复制的话，集合里面的元素也是内容复制么？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.15.</span> <span class="toc-nav-text">15. 为什么代理要用 weak ? 代理的 delegate 和 dataSource 有什么区别？ block 和代理的区别？</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">iOS 基础部分</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.1.</span> <span class="toc-nav-text">iOS 中常见的设计模式都有哪些？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.2.</span> <span class="toc-nav-text">讲一下你理解的 MVC 和 MVVM、MVP ？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.3.</span> <span class="toc-nav-text"></span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.4.</span> <span class="toc-nav-text">iOS 中的看门狗机制是什么？</span></a></li></ol></li></ol></li></ol>
         
         </div>
       </aside>
