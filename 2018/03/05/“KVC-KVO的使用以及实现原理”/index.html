@@ -144,14 +144,14 @@
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -377,6 +377,20 @@ The isa pointer, as the name suggests, points to the object’s class which main
 </ul>
 <p>因此，我们的 KVO 就是通过上述分析的这种机制，进行键值观察。<br>
 <img src="http://upload-images.jianshu.io/upload_images/2726320-fa39c5bab1cdf221.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="isa_swizzling.jpg"></p>
+<h3><span id="kvo-相关">KVO 相关</span></h3>
+<h4><span id="kvo-与-nsnotification-的区别">KVO 与 NSNotification 的区别</span></h4>
+<ul>
+<li>NSNotification 比 KVO 多了发送通知的一步</li>
+<li>两者都可以一对多，但是对象的交互，NSNotification 明显得多，需要 NSNotificationCenter 来作为中间交互，而 KVO 只需要设置观察者，然后处理属性就可以。</li>
+<li>NSNotification 的优点是监听不局限于属性的变化，还可以对于多种多样的状态进行监听</li>
+</ul>
+<h4><span id="kvo-与-delegate-的不同">KVO 与 delegate 的不同</span></h4>
+<p>和 delegate 比较，KVO 和 NSNotification 的作用都是类与类之间的通信，不同的是：</p>
+<ul>
+<li>这两个都是负责发送接受通知，剩下的事情交由系统处理，不用返回值，而代理需要通信的对象通过变量联系。</li>
+<li>delegate 只是一对一的，而KVO可以一对多。</li>
+<li>代理的本质是对象内存的传递和操作。</li>
+</ul>
 <h3><span id="文末">文末</span></h3>
 <p>通过上面的分析，我们也大概了解了 KVC 以及 KVO 的实现过程以及实现原理，对这个感兴趣的同学，我们可以试着去自己实现一下 KVC 以及 KVO。</p>
 
@@ -422,7 +436,7 @@ The isa pointer, as the name suggests, points to the object’s class which main
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">概念</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">KVC /  KVO 的使用</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">KVC的使用</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">KVO 的使用</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">实现原理</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">KVC 是如何寻找 Key 值的</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">KVO 的原理</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">文末</span></a></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">概念</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">KVC /  KVO 的使用</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">KVC的使用</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">KVO 的使用</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">实现原理</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">KVC 是如何寻找 Key 值的</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">KVO 的原理</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">KVO 相关</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.1.</span> <span class="toc-nav-text">KVO 与 NSNotification 的区别</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.2.</span> <span class="toc-nav-text">KVO 与 delegate 的不同</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">文末</span></a></li></ol>
         
         </div>
       </aside>
