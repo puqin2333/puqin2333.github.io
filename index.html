@@ -136,6 +136,13 @@
 
                         
                         <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
                             <a href="/about/">About</a>
                         </li>
                         
@@ -144,13 +151,6 @@
                         
                         <li>
                             <a href="/tags/">Tags</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
-                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -296,9 +296,7 @@ Objective-C 基础部分
             
 只要学过 iOS 的人，都会对 strong、weak、copy等关键字应该都会很熟悉。weak 属性关键字就是弱引用，它不会增加引用计数但却能保证指针的安全访问，在对象释放后置为 nil，从而避免错误的内存访问。主要为了解决循环引用的问题。
 
-但很少有人知道weak表其实是一个hash表，key是所指对象的地址，Value是 weak 指针的地址数组。
-weak 实现原理的过程
-Runt......
+接下来，我们会从 objc 库中的 NSObject.mm、 objc-weak.h  以及 objc-weak.mm 文件出发，去具体了解 we......
         </div>
     </a>
     
@@ -342,9 +340,9 @@ http 抓包
         </p>
         <div class="tags">
             
-              <a href="/tags/#工具" title="工具">工具</a>
-            
               <a href="/tags/#计算机网络" title="计算机网络">计算机网络</a>
+            
+              <a href="/tags/#工具" title="工具">工具</a>
             
         </div>
     
@@ -585,11 +583,11 @@ UIView 的指责之一是处理事件，一个视图是一个事件响应者，�
     <div class="tags">
         
             
-            <a href="/tags/#工具" title="工具" rel="2">工具</a>
+            <a href="/tags/#计算机网络" title="计算机网络" rel="4">计算机网络</a>
             
         
             
-            <a href="/tags/#计算机网络" title="计算机网络" rel="4">计算机网络</a>
+            <a href="/tags/#工具" title="工具" rel="2">工具</a>
             
         
             
