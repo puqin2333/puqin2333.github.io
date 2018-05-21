@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <title>
+        
+          链表的常见面试算法 - 普帅同学的博客|puqin’s blog
+        
+    </title>
+
+    <link rel="canonical" href="https://puqin2333.github.io/2018/05/21/链表的常见面试算法/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('null')
+            /*post*/
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/BeanTechSign-white.png');
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#数据结构" title="数据结构">数据结构</a>
+                            
+                        </div>
+                        <h1>链表的常见面试算法</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by Puqin Chen on
+                            2018-05-21
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">普帅同学的博客</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h2><span id="链表的基本概念">链表的基本概念</span></h2>
+<p>链表是一种递归的数据结构，它或空、或指向一个结点的引用，该节点还有一个元素和一个指向另一条链表的引用。</p>
+<h3><span id="涉及到的考点">涉及到的考点</span></h3>
+<p><strong>数组与链表的区别：</strong></p>
+<ul>
+<li>从内存分配和存储来说：数组在静态存储分配情形下，存储元素数量受限制，动态存储分配情形下，虽然存储空间可以扩充，但需要移动大量元素，导致操作效率降低，而且如果内存中没有更大块连续存储空间将导致分配失败；链表存储的节点空间只在需要的时候申请分配，只要内存中有空间就可以分配，操作比较灵活高效；；数组分配的内存是连续的，而链表在内存中的地址是不连续的；数组的存储密度相较于链表来说更大。</li>
+<li>从存取方式来说：数组可以顺序存取或者随机存取，而链表只能顺序存取；查找时，数组更快更简洁；插入和删除时，链表更容易。</li>
+</ul>
+<p><strong>单链表、双向链表、循环链表：</strong></p>
+<p>双向链表相比与单链表的优势在于它同时支持高效的正向及反向遍历，并且可以方便的在链表尾部删除结点（单链表可以方便的在尾部插入结点，但不支持高效的表尾删除操作）</p>
+<p>循环链表的无边界使得在这样的链表上设计算法会比普通链表更加容易。</p>
+<h2><span id="单链表常见的算法">单链表常见的算法</span></h2>
+<p><strong>1. 在 O(1) 时间复杂度内删除链表结点</strong></p>
+<p><em>题目描述</em>：给定链表的头指针和一个节点指针，在o(1) 时间内删除该节点。</p>
+<p><em>分析</em>：我们只需要用下一个节点的数据覆盖要删除的节点，就可以达到题目要求，但是当节点是尾节点等特殊情况，就需要另行讨论了。</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">void deleteNode(ListNode *head,ListNode* <span class="keyword">node</span><span class="title">) &#123;</span></span><br><span class="line"><span class="title">    if</span> (head == NULL &amp;&amp; <span class="keyword">node</span> <span class="title">== NULL</span>) &#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    if (<span class="keyword">node</span> <span class="title">-&gt; next</span> != NULL ) &#123;   // 一般正常情况</span><br><span class="line">        ListNode *nextNode = <span class="keyword">node</span> <span class="title">-&gt;next</span>;</span><br><span class="line">        <span class="keyword">node</span><span class="title">-&gt;val</span> = nextNode-&gt;val;</span><br><span class="line">        <span class="keyword">node</span><span class="title">-&gt;next</span> = nextNode-&gt;next;</span><br><span class="line">        </span><br><span class="line">        delete nextNode;</span><br><span class="line">        nextNode = NULL;</span><br><span class="line">    &#125; else if (head == <span class="keyword">node</span><span class="title">)&#123;       // 链表中只有一个节点</span></span><br><span class="line"><span class="title">        delete</span> <span class="keyword">node</span><span class="title">;</span></span><br><span class="line"><span class="title">        node</span> = NULL;</span><br><span class="line">        head = NULL;</span><br><span class="line">    &#125; else &#123;                        // 要删除的节点是尾节点</span><br><span class="line">        ListNode *p = head;</span><br><span class="line">        while (p-&gt;next != <span class="keyword">node</span><span class="title">) &#123;</span></span><br><span class="line"><span class="title">            p</span> = p-&gt;next;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        p-&gt;next = <span class="keyword">node</span><span class="title">-&gt;next</span>;</span><br><span class="line">        delete <span class="keyword">node</span><span class="title">;</span></span><br><span class="line"><span class="title">        node</span> = NULL;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>2. 单链表的转置</strong></p>
+<p><em>题目描述</em>：输入一个单向链表，输出逆序反转后的链表。</p>
+<p><em>分析</em>：单链表的转置，算是比较基本的链表的算法了。通常的思路是用三个指针循环一遍遍历链表就可以实现；当然，我们也可以通过递归的方法来实现。</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 非递归的方式</span></span><br><span class="line">    ListNode* <span class="keyword">reverse</span>(ListNode *head) &#123;</span><br><span class="line">        <span class="keyword">if</span> (head == <span class="keyword">NULL</span> || head -&gt; <span class="keyword">next</span> == <span class="keyword">NULL</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> head;</span><br><span class="line">        &#125;</span><br><span class="line">        ListNode *p = <span class="keyword">NULL</span>, *q = <span class="keyword">NULL</span>;</span><br><span class="line">        <span class="keyword">while</span> (head != <span class="keyword">NULL</span>) &#123;</span><br><span class="line">            p = head-&gt;<span class="keyword">next</span>;</span><br><span class="line">            head-&gt;<span class="keyword">next</span> = q;</span><br><span class="line">            q = head;</span><br><span class="line">            head = p;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> q;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 递归的方式</span></span><br><span class="line">    ListNode* reverse_Recursion(ListNode *head) &#123;</span><br><span class="line">        <span class="comment">// 这块儿，大家可能有疑问，这里说明一下，第一个是异常判断，第二个是递归结束条件</span></span><br><span class="line">        <span class="keyword">if</span> (head == <span class="keyword">NULL</span> || head -&gt; <span class="keyword">next</span> == <span class="keyword">NULL</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> head;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        ListNode *newHead = reverse_Recursion(head-&gt;<span class="keyword">next</span>);</span><br><span class="line">        </span><br><span class="line">        head-&gt;<span class="keyword">next</span>-&gt;<span class="keyword">next</span> = head;</span><br><span class="line">        head-&gt;<span class="keyword">next</span> = <span class="keyword">NULL</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> newHead;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p><strong>3. 求链表倒数第 K 个节点</strong></p>
+<p><strong>题目描述</strong>：输入一个单向链表，输出该链表中倒数第 K 个节点，链表的倒数第0个节点为链表的尾指针。<br>
+<em>分析：</em></p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">ListNode* FindKthToTail(ListNode* head, unsigned <span class="keyword">int</span> k) &#123;</span><br><span class="line">    <span class="comment">// 写一些简单算法的过程中，一定要注重代码的鲁棒性</span></span><br><span class="line">    <span class="keyword">if</span> (head == <span class="keyword">NULL</span> || k == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ListNode* pAhead = head;</span><br><span class="line">    ListNode* pBehind = <span class="keyword">NULL</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; k-<span class="number">1</span>; ++i) &#123;</span><br><span class="line">        <span class="keyword">if</span> (pAhead -&gt; <span class="keyword">next</span> != <span class="keyword">NULL</span>) &#123;</span><br><span class="line">            pAhead = pAhead-&gt;<span class="keyword">next</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">NULL</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    pBehind = head;</span><br><span class="line">    <span class="keyword">while</span> (pAhead-&gt;<span class="keyword">next</span> != <span class="keyword">NULL</span>) &#123;</span><br><span class="line">        pAhead = pAhead -&gt; <span class="keyword">next</span>;</span><br><span class="line">        pBehind = pBehind -&gt; <span class="keyword">next</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> pBehind;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>4. 求链表的中间节点</strong></p>
+<p>题目描述：求链表的中间节点，如果链表的长度为偶数，返回中间两个节点的任意一个，若为奇数，则返回中间节点。</p>
+<p><strong>5. 合并两个排序的链表</strong></p>
+<p>题目描述：将两个已排好序的单链表合并成一个链表</p>
+<p><strong>6. 交换相邻的节点</strong></p>
+<p><em>题目描述</em>：给定一个链表，交换每两个相邻的节点并返回它的头</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">ListNode* swapPairs(ListNode* head) &#123;</span><br><span class="line">    ListNode *newHead = new ListNode(<span class="number">0</span>);  </span><br><span class="line">    newHead-&gt;<span class="keyword">next</span> = head;  </span><br><span class="line">    ListNode *preNode = newHead, *curNode = head;  </span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> (curNode != NULL &amp;&amp; curNode-&gt;<span class="keyword">next</span> != NULL) &#123;  </span><br><span class="line">        preNode-&gt;<span class="keyword">next</span> = curNode-&gt;<span class="keyword">next</span>;</span><br><span class="line">        curNode-&gt;<span class="keyword">next</span> = preNode-&gt;<span class="keyword">next</span>-&gt;<span class="keyword">next</span>;  </span><br><span class="line">        preNode-&gt;<span class="keyword">next</span>-&gt;<span class="keyword">next</span> = curNode;  </span><br><span class="line">        preNode = curNode;  </span><br><span class="line">        curNode = curNode-&gt;<span class="keyword">next</span>;  </span><br><span class="line">    &#125;  </span><br><span class="line">    head = newHead-&gt;<span class="keyword">next</span>;  </span><br><span class="line">    delete newHead;  </span><br><span class="line">    <span class="keyword">return</span> head;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>7. 奇偶链表</strong></p>
+<p><em>题目描述</em>：给定一个单链表，将所有奇数节点组合在一起，然后是偶数节点。</p>
+<p><em>分析：</em> 奇节点的下一个节点恰好就是偶节点的下一个节点（1的下一个节点应该是2的下一个节点，也就是3），而偶节点的下一个节点也恰好是奇节点是下一个节点。这样我们就可以只通过odd和even两个变量来遍历了，既省去了用来遍历的head，也省去了一个变量</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">ListNode* oddEvenList(ListNode* head) &#123;</span><br><span class="line">    if(head == NULL)    <span class="keyword">return</span> NULL;</span><br><span class="line">    ListNode *oddNode = head, *evenNode = head-&gt;<span class="keyword">next</span>, *evenHead = evenNode;</span><br><span class="line">    <span class="keyword">while</span> (evenNode != NULL &amp;&amp; evenNode-&gt;<span class="keyword">next</span> != NULL) &#123;</span><br><span class="line">        oddNode-&gt;<span class="keyword">next</span> = evenNode-&gt;<span class="keyword">next</span>;</span><br><span class="line">        oddNode = oddNode-&gt;<span class="keyword">next</span>;</span><br><span class="line">        evenNode-&gt;<span class="keyword">next</span> = oddNode-&gt;<span class="keyword">next</span>;</span><br><span class="line">        evenNode = evenNode-&gt;<span class="keyword">next</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    oddNode-&gt;<span class="keyword">next</span> = evenHead;</span><br><span class="line">    <span class="keyword">return</span> head;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>8. 判断单链表是否存在环</strong></p>
+<p>题目描述：输入一个单向链表，判断链表是否有环。</p>
+<p><strong>9. 找到环的入口</strong></p>
+<p>题目描述：输入一个单向链表，判断链表是否有环。如果链表存在环，如何找到环的入口点？</p>
+<p><strong>10. 判断两个链表是否相交</strong></p>
+<p>题目描述：给出两个单向链表的头指针（如下图所示）。</p>
+<p><img src="http://ww2.sinaimg.cn/large/81b78497tw1eesdi7bb2kj20d403qaa0.jpg" alt="image"></p>
+<p>比如h1、h2，判断这两个链表是否相交。这里为了简化问题，我们假设两个链表均不带环。</p>
+<p><strong>11. 链表有环，如何判断相交</strong></p>
+<p>题目描述：上面的问题都是针对链表无环的，那么如果现在，链表是有环的呢?上面的方法还同样有效么?</p>
+<p><strong>12. 两链表相交的第一个公共节点</strong></p>
+<p>题目描述：如果两个无环单链表相交，怎么求出他们相交的第一个节点呢？</p>
+<h2><span id="链表的应用">链表的应用</span></h2>
+<p><strong>1. 大数相加</strong></p>
+<p><em>题目描述</em>： 给出两个非空链表，表示两个非负整数。数字以相反的顺序存储，每个节点都包含一个数字。两非负整数相加，并将其作为链表返回。</p>
+<p><em>分析</em>：</p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                        <li class="next">
+                            <a href="/2018/04/10/iOS常见的面试题/" data-toggle="tooltip" data-placement="top" title="iOS常见的面试题">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">链表的基本概念</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">涉及到的考点</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">单链表常见的算法</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">链表的应用</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#数据结构" title="数据结构">数据结构</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="http://beantech.org" target="_blank">Bean Tech</a></li>
+                    
+                        <li><a href="http://blog.kaijun.rocks" target="_blank">Kaijun&#39;s Blog</a></li>
+                    
+                        <li><a href="http://huangxuan.me" target="_blank">Hux Blog</a></li>
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "https://puqin2333.github.io/2018/05/21/链表的常见面试算法/";
+    var disqus_url = "https://puqin2333.github.io/2018/05/21/链表的常见面试算法/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/puqin.chen">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="http://weibo.com/5720008246">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/puqin2333">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; Puqin Chen 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="http://beantech.org">BeanTech</a> | 
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=YenYuHsuan&repo=hexo-theme-beantech&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://puqin2333.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="https://puqin2333.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
