@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          Charles 抓包分析 - 普帅同学的博客|puqin’s blog
+          Cocoapods  报错的解决方案 (macOS 10.13) - 普帅同学的博客|puqin’s blog
         
     </title>
 
-    <link rel="canonical" href="https://puqin2333.github.io/2018/03/30/Charles-抓包分析/">
+    <link rel="canonical" href="https://puqin2333.github.io/2018/07/29/Cocoapods-报错的解决方案-macOS-10-13/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -90,16 +90,12 @@
                     <div class="post-heading">
                         <div class="tags">
                             
-                              <a class="tag" href="/tags/#工具" title="工具">工具</a>
-                            
-                              <a class="tag" href="/tags/#计算机网络" title="计算机网络">计算机网络</a>
-                            
                         </div>
-                        <h1>Charles 抓包分析</h1>
+                        <h1>Cocoapods  报错的解决方案 (macOS 10.13)</h1>
                         <h2 class="subheading"></h2>
                         <span class="meta">
                             Posted by Puqin Chen on
-                            2018-03-30
+                            2018-07-29
                         </span>
                     </div>
                 
@@ -216,57 +212,15 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <blockquote>
-<p>Charles 是在Mac下常用的截取网络封包的工具，在做iOS开发时，我们为了调试与服务器端的网络通讯协议，常常需要截取网络封包来分析。Charles通过将自己设置成系统的网络访问代理服务器，使得所有的网络访问请求都通过它来完成，从而实现了网络封包的截取和分析。</p>
-</blockquote>
-<h2><span id="使用-charles-抓包的过程">使用 Charles 抓包的过程</span></h2>
-<h3><span id="http-抓包">http 抓包</span></h3>
-<p><strong>对于 mac</strong><br>
-在 mac 下进行 http 抓包，非常简单，只要打开 Charles 设置代理以后，就可以抓取 Mac 上的网络请求了。<br>
-<img src="https://upload-images.jianshu.io/upload_images/2525930-173a9e6af7bc4e75.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700" alt="image"></p>
-<p><strong>对于 iOS 设备：</strong></p>
-<ol>
-<li>在 Mac 中打开Charles 应用</li>
-<li>设置手机 HTTP 代理：确保移动设备与 Mac 笔记本在同一局域网内，添加代理 ip地址（Mac内网地址）和端口号（8888）</li>
-<li>在 iOS 设备上访问接口数据，在 Charles 弹出的确认窗口中选择 Allow，允许即可。</li>
-</ol>
-<h3><span id="https-抓包">https 抓包</span></h3>
-<p><strong>对于 mac</strong></p>
-<ol>
-<li>安装 Charles 证书：浏览器访问地址 <a href="http://www.charlesproxy.com/getssl" target="_blank" rel="noopener">http://www.charlesproxy.com/getssl</a> ，浏览器会下载证书并提示安装</li>
-<li>安装完成后，在 Charles 中选择需要代理地址，选中 Enable SSL Proxying，这样就可以抓取 HTTPS 数据包</li>
-</ol>
-<p><strong>对于 iOS</strong></p>
-<ol>
-<li>在 设置好手机 http 代理的前提下， 安装 SSL 证书到手机设备，点击 Help -&gt; SSL Proxying -&gt; Install Charles Root Certificate on a Mobile Device</li>
-<li>出现弹窗得到地址 <a href="http://chls.pro/ssl" target="_blank" rel="noopener">chls.pro/ssl</a> ，然后在手机浏览器上输入地址  <a href="http://chls.pro/ssl" target="_blank" rel="noopener">chls.pro/ssl</a> ，出现证书安装页面，点击安装手机设置有密码的输入密码进行安装<br>
-<img src="https://upload-images.jianshu.io/upload_images/2525930-7d1b48bb772cd066.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700" alt="image"></li>
-<li>Charless 设置 Proxy，进行 Proxy-&gt; SSL Proxying Settings ,勾选 Enable SSL proxying，点击 Add,设置要抓取的https接口</li>
-<li>进行 Https 抓包</li>
-</ol>
-<p>注； 有些 app 对接口内容进行了加密，看到的还是一堆乱码</p>
-<h2><span id="charles-抓包原理">Charles 抓包原理</span></h2>
-<p>Charles 本身就是一个协议代理工具，如果只是普通的HTTP请求，因为数据本身没有经过再次加密，因此作为代理可以知道所有客户端发送到服务端的请求内容以及服务端返回给客户端的数据内容，这也就是抓包工具能够将数据传输内容直接展现出来的原因。</p>
-<p>但是对于 HTTPS 请求，它发送的数据都进行了加密，代理如果什么都不做的话是无法获取到其中的内容的。为了实现这个过程的数据获取， Charles 需要做的事情是对客户端伪装成服务端，对服务端伪装成客户端，具体：</p>
+                <p>很久没有新写项目了，今天晚上通过 cocoapods 给项目添加第三方库的时候，突然提示 <code>-bash: /usr/local/bin/pod: /System/Library/Frameworks/Ruby.framework/Versions/2.0/usr/bin/ruby: bad interpreter: No such file or directory</code> 这样的错误信息。</p>
+<p>发现是系统预装的 ruby 版本变成了 2.3 ，于是之前安装的 cocoapods 就找不到之前的版本呢，选择重新安装即可。但是当我用 <code>sudo gem install cocoapods</code> 却出现了 以下错误<code>ERROR: While executing gem ... (Errno::EPERM) Operation not permitted - /usr/bin/pod</code>。</p>
+<p>从提示可以看出是因为没有权限在/usr/bin/这个目录写入。搜索后发现原因是系统的新安全机制：System Integrity Protection也叫作：rootless，这个默认的安全机制用于保护下面三个目录，所以无法在/usr/bin/中安装pod</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/System</span><br><span class="line">/sbin</span><br><span class="line">/usr (with the exception of /usr/local subdirectory)</span><br></pre></td></tr></table></figure>
+<p>同时，网上也给出了两种解决方案：</p>
 <ul>
-<li>截获真实客户端的HTTPS请求，伪装客户端向真实服务端发送HTTPS请求</li>
-<li>接受真实服务器响应，用Charles自己的证书伪装服务端向真实客户端发送数据内容</li>
+<li>关闭该机制，执行<code>$ sudo nvram boot-args=&quot;rootless=0&quot;; sudo reboot</code> 命令后，重启电脑，保证设置生效。</li>
+<li>绕开该机制，<code>sudo gem install -n /usr/local/bin cocoapods</code> 将 pod 安装在 /usr/local/bin 目录下。</li>
 </ul>
-<p>下图是整个过程：<br>
-<img src="https://upload-images.jianshu.io/upload_images/2438937-a453e3e411efcae5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700" alt="image"></p>
-<p>具体步骤如下：</p>
-<ol>
-<li>客户端向服务器发起 HTTPS 请求</li>
-<li>Charles 拦截客户端的请求，伪装成客户端向服务器进行请求</li>
-<li>服务器向“客户端”（实际上是 Charles）返回服务器的CA证书</li>
-<li>Charles 拦截服务器的响应，获取服务器证书公钥，然后自己制作一张证书，将服务器证书替换后发送给客户端。（这一步，Charles拿到了服务器证书的公钥）</li>
-<li>客户端接收到“服务器”（实际上是Charles）的证书后，生成一个对称密钥，用Charles的公钥加密，发送给“服务器”（Charles）</li>
-<li>Charles拦截客户端的响应，用自己的私钥解密对称密钥，然后用服务器证书公钥加密，发送给服务器。（这一步，Charles拿到了对称密钥）</li>
-<li>服务器用自己的私钥解密对称密钥，向“客户端”（Charles）发送响应</li>
-<li>Charles拦截服务器的响应，替换成自己的证书后发送给客户端</li>
-<li>至此，连接建立，Charles拿到了 服务器证书的公钥 和 客户端与服务器协商的对称密钥，之后就可以解密或者修改加密的报文了。</li>
-</ol>
-<p>简单来说，就是Charles作为“中间人代理”，拿到了 服务器证书公钥 和 HTTPS连接的对称密钥，前提是客户端选择信任并安装Charles的CA证书，否则客户端就会“报警”并中止连接。</p>
 
                 
 
@@ -274,13 +228,9 @@
                 <!-- Pager -->
                 <ul class="pager">
                     
-                        <li class="previous">
-                            <a href="/2018/04/02/weak-的实现原理/" data-toggle="tooltip" data-placement="top" title="weak 的实现原理">&larr; Previous Post</a>
-                        </li>
-                    
                     
                         <li class="next">
-                            <a href="/2018/03/28/iOS-UIResponder-的学习/" data-toggle="tooltip" data-placement="top" title="iOS UIResponder 的学习">Next Post &rarr;</a>
+                            <a href="/2018/05/21/链表的常见面试算法/" data-toggle="tooltip" data-placement="top" title="链表的常见面试算法">Next Post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -310,7 +260,7 @@
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">使用 Charles 抓包的过程</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">http 抓包</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">https 抓包</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">Charles 抓包原理</span></a></li></ol>
+          <ol class="nav">none</ol>
         
         </div>
       </aside>
@@ -330,10 +280,6 @@
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
-                          <a class="tag" href="/tags/#工具" title="工具">工具</a>
-                        
-                          <a class="tag" href="/tags/#计算机网络" title="计算机网络">计算机网络</a>
-                        
                     </div>
                 </section>
                 
@@ -367,8 +313,8 @@
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES * * */
     var disqus_shortname = "your-disqus-ID";
-    var disqus_identifier = "https://puqin2333.github.io/2018/03/30/Charles-抓包分析/";
-    var disqus_url = "https://puqin2333.github.io/2018/03/30/Charles-抓包分析/";
+    var disqus_identifier = "https://puqin2333.github.io/2018/07/29/Cocoapods-报错的解决方案-macOS-10-13/";
+    var disqus_url = "https://puqin2333.github.io/2018/07/29/Cocoapods-报错的解决方案-macOS-10-13/";
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
