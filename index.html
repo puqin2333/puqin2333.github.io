@@ -136,13 +136,6 @@
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
-                        </li>
-                        
-                    
-
-                        
-                        <li>
                             <a href="/about/">About</a>
                         </li>
                         
@@ -151,6 +144,13 @@
                         
                         <li>
                             <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
@@ -210,6 +210,39 @@
             
                 <!-- Main Content -->
 
+
+<div class="post-preview">
+
+    <a href="/2018/07/30/“从面试题中看GCD”/">
+        <h2 class="post-title">
+            “从面试题中看GCD”
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            从面试题中来学习 iOS 的 GCD
+在写这篇文章之前，先抛出几道题，大家可以一块儿讨论思考一下。
+
+题目一
+
+12345678@property (nonatomic, strong) NSString *target;//....dispatch_queue_t queue = dispatch_queue_create("parallel", DISPATCH_QUEUE_CONCUR......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by Puqin Chen on
+            2018-07-30
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#iOS" title="iOS">iOS</a>
+            
+        </div>
+    
+
+</div>
+<hr>
 
 <div class="post-preview">
 
@@ -402,9 +435,9 @@ http 抓包
         </p>
         <div class="tags">
             
-              <a href="/tags/#计算机网络" title="计算机网络">计算机网络</a>
-            
               <a href="/tags/#工具" title="工具">工具</a>
+            
+              <a href="/tags/#计算机网络" title="计算机网络">计算机网络</a>
             
         </div>
     
@@ -512,42 +545,6 @@ UIView 和 CALayer 的区别
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/2018/03/15/Objective-C-中-load-和-initialize-方法/">
-        <h2 class="post-title">
-            Objective-C 中 load 和 initialize 方法
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            
-Objective-C 中绝大部分的类都继承自 NSObject 类。而在 NSObject 类中有两个特殊的类方法 + load 和 + initialize，用于类的初始化。
-
-load 和 initialize 的共同特点
-load 和 initialize 有很多共同点，比如：
-
-在不考虑开发者主动使用的情况下，系统最多调用一次
-如果父类和子类都被调用，父类的调用一定在子类之前
-都......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by Puqin Chen on
-            2018-03-15
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#iOS" title="iOS">iOS</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
@@ -584,15 +581,15 @@ load 和 initialize 有很多共同点，比如：
     <div class="tags">
         
             
-            <a href="/tags/#计算机网络" title="计算机网络" rel="4">计算机网络</a>
-            
-        
-            
             <a href="/tags/#工具" title="工具" rel="2">工具</a>
             
         
             
-            <a href="/tags/#iOS" title="iOS" rel="13">iOS</a>
+            <a href="/tags/#计算机网络" title="计算机网络" rel="4">计算机网络</a>
+            
+        
+            
+            <a href="/tags/#iOS" title="iOS" rel="14">iOS</a>
             
         
             
@@ -669,6 +666,10 @@ load 和 initialize 有很多共同点，比如：
     <ul>
       
         <li>
+          <a href="/2018/07/30/“从面试题中看GCD”/">“从面试题中看GCD”</a>
+        </li>
+      
+        <li>
           <a href="/2018/07/29/Cocoapods-报错的解决方案-macOS-10-13/">Cocoapods  报错的解决方案 (macOS 10.13)</a>
         </li>
       
@@ -682,10 +683,6 @@ load 和 initialize 有很多共同点，比如：
       
         <li>
           <a href="/2018/04/08/iOS-多线程之GCD/">iOS 多线程之GCD</a>
-        </li>
-      
-        <li>
-          <a href="/2018/04/02/weak-的实现原理/">weak 的实现原理</a>
         </li>
       
     </ul>
