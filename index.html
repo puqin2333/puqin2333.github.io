@@ -136,14 +136,14 @@
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -210,6 +210,41 @@
             
                 <!-- Main Content -->
 
+
+<div class="post-preview">
+
+    <a href="/2018/08/08/iOS-图片处理的小-Tips/">
+        <h2 class="post-title">
+            iOS 图片处理的小 Tips
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            UIImage 的本地保存
+保存 UIImage 有三种方式：
+
+直接使用 NSKeyedArchiver，把 UIImage 序列化保存
+用 UIImagePNGRepresentation() 把图片转为 PNG 保存
+用 UIImageJPEGRepresentation() 把图片压缩成 JPEG 保存。
+
+其中，方法一也是调用了 UIImagePNGRepresentation 进......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by Puqin Chen on
+            2018-08-08
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#iOS" title="iOS">iOS</a>
+            
+        </div>
+    
+
+</div>
+<hr>
 
 <div class="post-preview">
 
@@ -508,42 +543,6 @@ UIView 的指责之一是处理事件，一个视图是一个事件响应者，�
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/2018/03/25/iOS-多线程之NSOperation、NSOperationQueue/">
-        <h2 class="post-title">
-            iOS 多线程之NSOperation、NSOperationQueue
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            
-NSOperation、NSOperationQueue 是苹果为我们提供的一项多线程解决方案，它是对 GCD 的更高一层的封装，面向对象。比起GCD更加简单易用、代码可读性也更好。
-
-基本认识
-在 NSOperation 中也有类似任务和队列的概念。我们把任务称作操作，把队列称作操作队列。
-
-
-操作（Operation）：执行操作的意思，换句话说就是你在线程中执行的那段代码。
-在 GCD......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by Puqin Chen on
-            2018-03-25
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#iOS" title="iOS">iOS</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
@@ -588,7 +587,7 @@ NSOperation、NSOperationQueue 是苹果为我们提供的一项多线程解决�
             
         
             
-            <a href="/tags/#iOS" title="iOS" rel="15">iOS</a>
+            <a href="/tags/#iOS" title="iOS" rel="16">iOS</a>
             
         
             
@@ -665,6 +664,10 @@ NSOperation、NSOperationQueue 是苹果为我们提供的一项多线程解决�
     <ul>
       
         <li>
+          <a href="/2018/08/08/iOS-图片处理的小-Tips/">iOS 图片处理的小 Tips</a>
+        </li>
+      
+        <li>
           <a href="/2018/08/04/iOS-Crash-的学习/">iOS Crash 的学习</a>
         </li>
       
@@ -678,10 +681,6 @@ NSOperation、NSOperationQueue 是苹果为我们提供的一项多线程解决�
       
         <li>
           <a href="/2018/05/21/链表的常见面试算法/">链表的常见面试算法</a>
-        </li>
-      
-        <li>
-          <a href="/2018/04/10/iOS常见的面试题/">iOS常见的面试题</a>
         </li>
       
     </ul>

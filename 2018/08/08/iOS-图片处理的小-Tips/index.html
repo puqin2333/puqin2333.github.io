@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          普帅同学的博客|puqin’s blog
+          iOS 图片处理的小 Tips - 普帅同学的博客|puqin’s blog
         
     </title>
 
-    <link rel="canonical" href="https://puqin2333.github.io/archives/3/">
+    <link rel="canonical" href="https://puqin2333.github.io/2018/08/08/iOS-图片处理的小-Tips/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -69,8 +69,8 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('/img/header_img/home-bg-2-dark.png') 
-            /*config*/
+            background-image: url('null')
+            /*post*/
         
     }
     
@@ -87,10 +87,18 @@
             <div class="row">
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 
-                    <div class="site-heading">
-                        <h1>普帅同学的博客</h1>
-                        <!--<hr class="small">-->
-                        <span class="subheading">心里有光，就不怕远处的黑暗</span>
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
+                            
+                        </div>
+                        <h1>iOS 图片处理的小 Tips</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by Puqin Chen on
+                            2018-08-08
+                        </span>
                     </div>
                 
 
@@ -193,247 +201,196 @@
 
 
     <!-- Main Content -->
-    <!-- Main Content -->
-<div class="container">
-    <div class="row">
-        
+    <!-- Modify by Yu-Hsuan Yen -->
 
-<!-- USE SIDEBAR -->
-    <!-- Post Container -->
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
             <div class="
-                col-lg-8 col-lg-offset-1
-                col-md-8 col-md-offset-1
-                col-sm-12
-                col-xs-12
-                post-container
-            ">
-            
-                <!-- Main Content -->
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
 
-
-<div class="post-preview">
-
-    <a href="/2018/02/04/Mac下GitHub的使用/">
-        <h2 class="post-title">
-            Mac下GitHub的使用
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            Mac 下  GitHub 的使用
-[TOC]
-本文主要是讲讲Mac 环境下 GitHub 的前期配置和 用 git 命令上传你的本地项目
-准备工作
-
-下载 最新版的 git ,
-自己创建一个 GitHub 账号
-
-GitHub 环境配置
-安装 git
-
-在mac的终端上，输入git会提示安装git软件，确认安装。安装完成后打开终端，使用git --version或者which git命令查......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by Puqin Chen on
-            2018-02-04
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#工具" title="工具">工具</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2018/01/24/我有路，正在走/">
-        <h2 class="post-title">
-            我有路，正在走
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            我是谁
-还记得第一次提出“我是谁，我从哪来，我要去哪？”这一问题的是我的高中班主任。他将此作为高三第一次班会主题，让我们思考交流。
-...
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by Puqin Chen on
-            2018-01-24
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#生活" title="生活">生活</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
-
-
-<!-- Pager -->
-
-<ul class="pager">
-    
-        <li class="previous">
-            <a href="/archives/2/">&larr; Newer Posts</a>
-        </li>
-    
-    
+                <h4><span id="uiimage-的本地保存">UIImage 的本地保存</span></h4>
+<p>保存 UIImage 有三种方式：</p>
+<ol>
+<li>直接使用 NSKeyedArchiver，把 UIImage 序列化保存</li>
+<li>用 <code>UIImagePNGRepresentation()</code> 把图片转为 PNG 保存</li>
+<li>用 <code>UIImageJPEGRepresentation()</code> 把图片压缩成 JPEG 保存。</li>
+</ol>
+<p>其中，方法一也是调用了 <code>UIImagePNGRepresentation</code> 进行序列化，用它保存图片的消耗是最大的。苹果对 JPEG 有硬编码和硬解码，保存成 JPEG 会大大缩减编码解码时间，也能减小文件体积。所以如果图片不包含透明像素时，<code>UIImageJPEGRepresentation(0.9)</code> 是最佳的图片保存方式，其次是 <code>UIImagePNGRepresentation()</code>。</p>
+<h4><span id="uiimage-的-缓存">UIImage 的 缓存</span></h4>
+<p><strong>通过 imageNamed 创建 UIImage</strong> 时，系统实际上只是在 Bundle 内查找到文件名，将其放到 UIImage 里返回。当显示在屏幕上时，内部的解码方法才会被调用，并且会将解码的结构保存在一个全局缓存里，并且会长期存在（除非收到内存警告）。也就是说imageNamed:会有图片缓存的功能，当下次访问图片的时候速度会更快。<br>
+用这种方式加载图片，图片的内存管理并不受程序员控制。</p>
+<p>如果把image对象设置为nil，如果是其它对象，那么没有强指针指向一个对象，这个对象就会销毁；但是即使image = nil，它会指向的图片资源也不会销毁。</p>
+<p><strong>使用 imageWithData 能不能避免缓存？</strong></p>
+<p>答案是不能，通过数据创建 UIImage 时，UIImage 底层是调用 ImageIO 的 <code>CGImageSourceCreateWithData()</code> 方法。该方法有个参数叫 ShouldCache，在 64 位的设备上，这个参数是默认开启的。这个图片也是同样在第一次显示到屏幕时才会被解码，随后解码数据被缓存到 CGImage 内部。与 imageNamed 创建的图片不同，如果这个图片被释放掉，其内部的解码数据也会被立刻释放。</p>
+<p><strong>避免缓存的方法</strong></p>
+<ol>
+<li>手动调用 <code>CGImageSourceCreateWithData()</code> 创建图片，并关掉 <code>ShouldCache</code> 和 <code>ShouldCacheImmediately</code>  。但是这种方式会导致每次图片显示到屏幕时，解码方法都会被调用，造成很大的 CPU 占用。</li>
+<li>把图片用 <code>CGContextDrawImage()</code> 绘制到画布上，然后把画布的数据取出来当作图片。</li>
+</ol>
+<h4><span id="几种方式加载图片">几种方式加载图片</span></h4>
+<ul>
+<li>第一种就是上面说的 <code>imageNamed:</code> 方法加载图片，因为有缓存功能，所以再次访问速度更快。具体可以看上面。</li>
+<li>通过 <code>imageWithContentsOfFile:</code>  方式加载图片：
+<ul>
+<li>使用这个方法加载图片，当指向图片对象的指针销毁或指向其它对象，这个图片对象没有其它强指针指向，这个图片对象会销毁，不会一直在内存中停留。</li>
+<li>因为没有缓存，所以如果相同的图片多次加载，那么也会有多个图片对象来占用内存，而不是用缓存的图片。</li>
+<li>使用这个方法，需要file的全路径（之前用NSString, NSArray之类的加载文件也是一样的，比如stringWithContentsOfFile:，看到file就知道是需要传入全路径。）</li>
 </ul>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSString</span> *imagePath = [[<span class="built_in">NSBundle</span> mainBundle] pathForResource:imageName ofType:<span class="string">@"png"</span>];</span><br><span class="line"><span class="built_in">UIImage</span> *image = [<span class="built_in">UIImage</span> imageWithContentsOfFile:imagePath];</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><strong>注意</strong>如果图片在Images.xcassets中，是不能使用第二种方法的。所以说想要自己进行图片的内存管理，那么要将图片资源直接拖入工程，而不是放在Images.xcassets中。</p>
+<h4><span id="png-与-jpeg-的区别">PNG 与 JPEG 的区别</span></h4>
+<p>png是一种使用无损压缩的图片格式，而大家熟知的另外一种图片格式——jpeg则是采用有损压缩的方式。<br>
+用通俗易懂的方式来讲，当原图片数据被编码成png格式后，是可以完全还原成原本的图片数据的，而编码成jpeg则会损耗一部分图片数据，这是因为两者的编码方式和定位不同。jpeg着重于人眼的观感，保留更多的亮度信息，去掉一些不影响观感的色度信息，因此是有损耗的压缩。png则保留原始所有的颜色信息，并且支持透明／alpha通道，然后采用无损压缩进行编码。因此对于jpeg来说，通常适合颜色更丰富、可以在人眼识别不了的情况下尽可能去掉冗余颜色数据的图片，比如照片之类的图片；而png适合需要保留原始图片信息、需要支持透明度的图片。</p>
 
+                
 
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                        <li class="next">
+                            <a href="/2018/08/04/iOS-Crash-的学习/" data-toggle="tooltip" data-placement="top" title="iOS Crash 的学习">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
 
-                <!-- 如果开启评论功能 -->
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                    <div class="comment">
+                        <div id="disqus_thread" class="disqus-thread"></div>
+                    </div>
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">UIImage 的本地保存</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">UIImage 的 缓存</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">几种方式加载图片</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">PNG 与 JPEG 的区别</span></a></li></ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="http://beantech.org" target="_blank">Bean Tech</a></li>
+                    
+                        <li><a href="http://blog.kaijun.rocks" target="_blank">Kaijun&#39;s Blog</a></li>
+                    
+                        <li><a href="http://huangxuan.me" target="_blank">Hux Blog</a></li>
+                    
+                        <li><a href="#" target="_blank">It Helps SEO</a></li>
+                    
+                </ul>
                 
             </div>
-
-          <!-- Sidebar Container -->
-<div class="
-    col-lg-3 col-lg-offset-0
-    col-md-3 col-md-offset-0
-    col-sm-12
-    col-xs-12
-    sidebar-container
-">
-    
-        <!-- Featured Tags -->
-
-<section>
-    <!-- no hr -->
-    <h5><a href="/tags/">FEATURED TAGS</a></h5>
-    <div class="tags">
-        
-            
-            <a href="/tags/#工具" title="工具" rel="2">工具</a>
-            
-        
-            
-            <a href="/tags/#计算机网络" title="计算机网络" rel="4">计算机网络</a>
-            
-        
-            
-            <a href="/tags/#iOS" title="iOS" rel="16">iOS</a>
-            
-        
-            
-        
-            
-        
+        </div>
     </div>
-</section>
+</article>
 
-        <hr>
-    
-        <!-- Short About -->
-<section class="visible-md visible-lg">
-    <h5><a href="/about/">ABOUT ME</a></h5>
-    <div class="short-about">
 
-        
-            <img id = "avatar_pic" src="/img/iconman.png" />
-        
 
-        
-            <p>写写代码、聊聊人生、谈谈未来</p>
-        
 
-        <!-- SNS Link -->
-        <ul class="list-inline">
-            
-            
-            
-                <li>
-                    <a target="_blank" href="https://www.zhihu.com/people/puqin.chen">
-                        <span class="fa-stack fa-lg">
-                            <i class="fa fa-circle fa-stack-2x"></i>
-                            <i class="fa  fa-stack-1x fa-inverse">知</i>
-                        </span>
-                    </a>
-                </li>
-            
+<!-- disqus embedded js code start (one page only need to embed once) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "your-disqus-ID";
+    var disqus_identifier = "https://puqin2333.github.io/2018/08/08/iOS-图片处理的小-Tips/";
+    var disqus_url = "https://puqin2333.github.io/2018/08/08/iOS-图片处理的小-Tips/";
 
-            
-                <li>
-                    <a target="_blank" href="http://weibo.com/5720008246">
-                        <span class="fa-stack fa-lg">
-                            <i class="fa fa-circle fa-stack-2x"></i>
-                            <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
-                        </span>
-                    </a>
-                </li>
-            
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus embedded js code start end -->
 
-            
 
-            
-                <li>
-                    <a target="_blank"  href="https://github.com/puqin2333">
-                        <span class="fa-stack fa-lg">
-                            <i class="fa fa-circle fa-stack-2x"></i>
-                            <i class="fa fa-github fa-stack-1x fa-inverse"></i>
-                        </span>
-                    </a>
-                </li>
-            
-            
-            
-            
-        </ul>
-    </div>
-</section>
-        <hr>
-    
-        
-  <h5>RECENT POSTS</h3>
-  <div class="widget">
-    <ul>
-      
-        <li>
-          <a href="/2018/08/08/iOS-图片处理的小-Tips/">iOS 图片处理的小 Tips</a>
-        </li>
-      
-        <li>
-          <a href="/2018/08/04/iOS-Crash-的学习/">iOS Crash 的学习</a>
-        </li>
-      
-        <li>
-          <a href="/2018/07/30/“从面试题中看GCD”/">“从面试题中看GCD”</a>
-        </li>
-      
-        <li>
-          <a href="/2018/07/29/Cocoapods-报错的解决方案-macOS-10-13/">Cocoapods  报错的解决方案 (macOS 10.13)</a>
-        </li>
-      
-        <li>
-          <a href="/2018/05/21/链表的常见面试算法/">链表的常见面试算法</a>
-        </li>
-      
-    </ul>
-  </div>
 
-        <hr>
-    
-        <!-- Categories -->
 
-        <hr>
-    
-</div>
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
 
-        
-    </div>
-</div>
 
 
     <!-- Footer -->
