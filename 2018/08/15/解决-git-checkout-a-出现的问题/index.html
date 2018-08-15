@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          iOS Crash 的学习 - 普帅同学的博客|puqin’s blog
+          解决 git checkout a 出现的问题 - 普帅同学的博客|puqin’s blog
         
     </title>
 
-    <link rel="canonical" href="https://puqin2333.github.io/2018/08/04/iOS-Crash-的学习/">
+    <link rel="canonical" href="https://puqin2333.github.io/2018/08/15/解决-git-checkout-a-出现的问题/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -92,12 +92,14 @@
                             
                               <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
                             
+                              <a class="tag" href="/tags/#git" title="git">git</a>
+                            
                         </div>
-                        <h1>iOS Crash 的学习</h1>
+                        <h1>解决 git checkout a 出现的问题</h1>
                         <h2 class="subheading"></h2>
                         <span class="meta">
                             Posted by Puqin Chen on
-                            2018-08-04
+                            2018-08-15
                         </span>
                     </div>
                 
@@ -214,134 +216,51 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <h2><span id="ios-crash-的知识梳理">iOS Crash 的知识梳理</span></h2>
-<p>[TOC]</p>
-<p>iOS 上的 APP 会遇到各种各样的原因，第三方库不兼容、响应超时、内存等都可能造成 Crash 。但是更多的情况是 程序本身的代码逻辑产生了错误。比如，NSArray等集合容器的越界问题、调用不存在的方法，调用函数参数不符合要求等等。</p>
-<p>在开发的过程中，我们可以在 Xcode 上通过一些方法可以捕获到异常，从而定位到出错代码。但是对于已经发布的 APP 来说，想要通过这种方式定位到代码就比较困难了。因此，在 crash  发现之前就去预测到问题代码，这是件非常有意义的事情。</p>
-<p>最近，也了解一些这部分的知识，也将看到的知识作为一个梳理，对于后续的项目中 crash 数据的预处理或多或少的提供一种帮助。</p>
-<h3><span id="1-常见的-crash-类型">1. 常见的 crash 类型</span></h3>
-<h4><span id="1-1-oc-exception">1. 1 OC Exception</span></h4>
-<p>由 iOS 库或者各种第三方库或者 OC Runtime 验证出错误而抛出异常。<br>
-常见的 OC 异常，包括：</p>
-<pre><code>NSInvalidArgumentException // 非法参数异常是 OC 代码中最常出现的错误，比如集合数据的参数传递、一些API的错误使用以及未实现一些方法等。
-NSRangeException // 越界异常，常见的场景包括数组最大下标处理错误 | 下标的值是个不确定的变量 | 使用空数组
-NSGenericException // 这个异常经常出现在 for in 中，当你 add 或 remove 遍历的数组时，就会出错
-NSInternalInconsistencyException // 不一致导致的出错，比如你把 NSDictionary 当作 可变的 NSMutableDictionary 来使用，就会产生这样的错误。还有我们界面使用不当的时候，也会抱这种错误。
-NSFileHandleOperationException // 内存空间不足，无法分配足够的内存空间，就会报此类问题。
-</code></pre>
-<p>下图，就是一个 NSRangeException 的异常。<br>
-<img src="https://s1.ax1x.com/2018/08/01/PwTSmT.png" alt="PwTSmT.png"></p>
-<p>在debug环境下，OC异常导致崩溃时Xcode控制台会输出完整的异常信息。<br>
-非debug环境下，可以通过注册 NSUncaughtExceptionHandler 捕获异常信息。</p>
-<h4><span id="12-mach-exception">1.2  Mach Exception</span></h4>
-<p><a href="https://zh.wikipedia.org/wiki/Mach?spm=a2c4e.11153940.blogcont499180.16.390f34eaVPTKAa" target="_blank" rel="noopener">Mach</a> 为 <a href="https://zh.wikipedia.org/wiki/XNU" target="_blank" rel="noopener">XNU</a> 的微内核，Mach 异常是指最底层的内核级异常。在 iOS 系统中，底层 Crash 先触发 Mach 异常，然后再转换为对应的 signal 信号。</p>
+                <h2><span id="解决-git-checkout-a-出现的问题">解决 git checkout a 出现的问题</span></h2>
+<h3><span id="解决方案">解决方案</span></h3>
+<p>今天，提交代码需要合并分支的时候，当在终端输入<code>git checkout master</code> 命令时，却报了如下错误：</p>
+<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">error: </span>Your local changes to the following files would be overwritten by checkout:</span><br><span class="line">	Assistant.xcworkspace/xcuserdata/chen.xcuserdatad/UserInterfaceState.xcuserstate</span><br><span class="line">Please commit your changes or stash them before you switch branches.</span><br><span class="line">Aborting</span><br></pre></td></tr></table></figure>
+<p>错误翻译过来就是，当前分支有未跟踪的文件，checkout 命令会覆盖它们，请缓存( stash )或者提交( commit )。<br>
+所以，针对错误提示，我们选择缓存或者提交两种方法来解决这个问题。</p>
 <ul>
-<li>两种常见的 Mach 异常：
-<ol>
-<li><code>EXC_BAD_ACCESS(Bad Memory Access)</code> ：内存访问错误，分为：访问对象未初始化(SIGBUS 信号) 和访问的东西被回收掉(SIGSEGV 信号)</li>
-<li><code>EXC_BAD_INSTRUCTION(Illegal Instruction)</code> ：通过 SIGILL信号触发的。它是在说运行了一条非法的指令。错误格式：`XC_BAD_INSTRUCTION (code=EXC_I386_INVOP, 	subcode=0x0)</li>
-</ol>
-</li>
-<li>其他类型的异常<br>
-1. <code>EXC_RESOURCE</code>是指的程序到达资源上限，比如cpu占用过高，内存不足之类的<br>
-2. <code>EXC_GUARD</code>是一些c层函数访问错误导致的异常，比如fopen文件访问错误之类的都会爆出这个<br>
-3. <code>0x00000020</code>这种错误基本上都是在 FreeBSD 中。比较常见的就是 看门狗机制。</li>
+<li>stash 暂存到缓存区</li>
 </ul>
-<h4><span id="13-unix-signal-exceptions">1.3 Unix Signal Exceptions</span></h4>
-<p>从 Mach 异常最终会转化成 Unix 信号投递到出错的线程，如果想要具体了解的可以参考<a href="http://www.cocoachina.com/ios/20150701/12301.html" target="_blank" rel="noopener">《漫谈iOS Crash收集框架》</a>。<br>
-注意：</p>
-<blockquote>
-<p>OC异常并不是真正的异常，但是当一个OC异常被抛出到最外层还没被捕获，程序会强行发送SIGABRT信号中断程序。<br>
-Mach异常没有比较便利的捕获方式，既然它最终会转化成信号，我们也可以通过捕获信号，来捕获 Crash 事件。</p>
-</blockquote>
-<p>同时， iOS 提供了 signal 方法来注册一个处理函数，在处理函数中，使用execinfo中的 backtrace_symbols取出汇编层程序的堆栈信息。</p>
-<pre><code>void InstallSignalHandler(void) {
-    signal(SIGHUP, handleSignalException);
-    signal(SIGINT, handleSignalException);
-    signal(SIGQUIT, handleSignalException);
- 
-    signal(SIGABRT, handleSignalException);
-    signal(SIGILL, handleSignalException);
-    signal(SIGSEGV, handleSignalException);
-    signal(SIGFPE, handleSignalException);
-    signal(SIGBUS, handleSignalException);
-    signal(SIGPIPE, handleSignalException);
-}
-void handleSignalException(int signal) {
-    NSMutableString * crashInfo = [[NSMutableString alloc]init];
-    [crashInfo appendString:[NSString stringWithFormat:@&quot;signal:%d\n&quot;,signal]];
-    [crashInfo appendString:@&quot;Stack:\n&quot;];
-    void* callstack[128];
-    int i, frames = backtrace(callstack, 128);
-    char** strs = backtrace_symbols(callstack, frames);
-    for (i = 0; i &lt;frames; ++i) {         
-		    [crashinfo appendformat:@&quot;%s\n&quot;, strs[i]];    
-	}
-	[wzcrashreporter savecrash:crashinfo];
-}
-</code></pre>
-<p>想要了解各种信号的含义可以学习<a href="http://www.iosxxx.com/blog/2015-08-29-iosyi-chang-bu-huo.html" target="_blank" rel="noopener">《iOS异常捕获》</a></p>
-<p>以上，基本上就是我们所能遇到的异常类型了。</p>
-<h3><span id="2-ios-crash-日志">2. iOS Crash 日志</span></h3>
-<h4><span id="21-日志结构">2.1 日志结构</span></h4>
-<p><strong>一份 iOS crash 日志都包含以下信息：</strong><br>
-<img src="https://s1.ax1x.com/2018/08/02/P0PCM8.png" alt="P0PCM8.png"><br>
-<img src="https://s1.ax1x.com/2018/08/02/P0P3dJ.png" alt="P0P3dJ.png"></p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git <span class="keyword">add</span> .  </span><br><span class="line">git stash <span class="comment">// 把当前分支所有没有 commit 的代码先暂存起来，然后进行分支的切换</span></span><br><span class="line"><span class="comment">// 当你又需要之前的代码时，我们可以使用以下命令</span></span><br><span class="line">git stash pop <span class="comment">// pop 会帮你把代码还原，还自动帮你 把这条 stash 记录删除</span></span><br></pre></td></tr></table></figure>
 <ul>
-<li>进程信息：闪退进程的相关报告
-<ul>
-<li>Incident Identifier ： 崩溃报告的唯一标识符。</li>
-<li>CrashReporter Key：与设备标识相对应的唯一键值</li>
-<li>Hardware Model:  标识设备类型</li>
-<li>Process :对项目的操作权限</li>
-<li>Path:崩溃文件的路径</li>
-<li>还有一些其他崩溃消息</li>
+<li>commit 发起一个 commit，存到提交历史</li>
 </ul>
-</li>
-<li>一些基本信息，闪退的时间什么的</li>
-<li>异常类型：
-<ul>
-<li>Exception Type:异常的类型。</li>
-<li>Exception Codes ：异常错误码</li>
-<li>Termination Reason：闪退的原因，比如常见的数组越界啊，什么的。</li>
-<li>Triggered by Thread：出现问题在哪个线程，这个比较重要，首先确定在哪个线程中出了问题，然后再去定位</li>
-</ul>
-</li>
-<li>线程回溯：提供应用中所有线程的回溯日志。线程调用的一些堆栈信息。 它包括四列：
-<ul>
-<li>帧编号</li>
-<li>调用库以及一些静态二进制库的名称</li>
-<li>调用方法的地址</li>
-<li>分为两个子列：基地址和偏移量。这里的方法名是已经被符号化后的状态。</li>
-</ul>
-</li>
-<li>线程状态：闪退时寄存器中的值。一般不需要这部分的信息。</li>
-<li>二进制映像：闪退时已经加载的二进制文件。</li>
-</ul>
-<h4><span id="22-符号化">2.2 符号化</span></h4>
-<p>所谓符号化，就是将 crash 文件线程回溯部分中的基地址+偏移地址转变成 方法名 + 行数。有几种符号化的方法：</p>
-<ol>
-<li>
-<p><strong>symbolicatecrash</strong><br>
-需要获取到 .dsym文件或 .app 文件 ，和 crash 文件放在同一目录下，执行命令。</p>
-</li>
-<li>
-<p><strong>命令行工具 atos</strong><br>
-symbolicatecrash 可以帮助我们很好的分析 crash 日志，但是有它的局限性 — 不够灵活。我们需要 symbolicatecrash、.crash 及 .dSYM  三个文件才能解析。<br>
-相对于 symbolicatecrash， atos 命令更加灵活，特别是你需要对不同渠道的 crash 文件，写一个自动化的分析脚本的时候，这个方法优势很大。<br>
-但是这种方式也有个不方便的地方：一个线上的 App，用户使用的版本存在差异，而每个版本所对应的 .dSYM 都是不同的。必须确保 .crash 和 .dSYM 文件是匹配的，才能正确符号化，匹配的条件就是它们的 UUID 一致。<br>
-有人已经收集完了不同机型的符号文件，可以<a href="https://zuikyo.github.io/2016/12/18/iOS%20Crash%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90%E5%BF%85%E5%A4%87%EF%BC%9A%E7%AC%A6%E5%8F%B7%E5%8C%96%E7%B3%BB%E7%BB%9F%E5%BA%93%E6%96%B9%E6%B3%95/" target="_blank" rel="noopener">了解一下</a>。</p>
-</li>
-<li>
-<p><strong>使用集成的工具</strong></p>
-</li>
-</ol>
-<p>具体内容，可以参考<a href="http://www.cocoachina.com/ios/20170823/20342.html" target="_blank" rel="noopener">iOS Crash 捕获及堆栈符号化思路解析</a></p>
-<h3><span id="3实际应用">3.实际应用</span></h3>
-<p>通过对上面两部分内容的理解，我们也可以大致的理解和尝试着去定位出错代码。<br>
-在项目中，在只能拿到 crash 文件的情况下，去通过上述方式定位到异常位置，找到 crash 的偏移地址，在 <a href="http://zrongl.github.io/2015/06/19/150619-mach-o-file-format/" target="_blank" rel="noopener">Mach-O 文件</a>中进行截取上下文一部分内容，做后续的处理，放入到 CNN 网络中进行学习。</p>
-<h3><span id="4-后续">4. 后续</span></h3>
-<p>接下来，会去收集更多的 crash 数据，然后试着在 mach-o 文件中进行截取。</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git <span class="keyword">add</span><span class="bash"> .</span></span><br><span class="line"><span class="bash">git commit -m <span class="string">"xxxxx"</span>  // 这个命令比较简单，就是提交信息</span></span><br></pre></td></tr></table></figure>
+<p>以上这两种方法就是针对你未跟踪文件的内容改动很重要，需要保存修改的情况。</p>
+<p>如果说，我们之前的改动不重要，我们可以放弃修改，这时候，我们可以清除未跟踪的文件。</p>
+<figure class="highlight excel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clean</span> <span class="built_in">n</span>  //这个是清除文件预览</span><br><span class="line">git <span class="built_in">clean</span> -f //强制清除文件</span><br></pre></td></tr></table></figure>
+<p>或者使用 <code>git checkout -f &lt;branch&gt;</code> 强制切换分支。（但是大多数情况下，我们还是不要这样操作）</p>
+<h3><span id="原因分析">原因分析</span></h3>
+<p>git 的本地版本管理有三个部分：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">名称</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">工作区（Working Directory）</td>
+<td>直接编辑的文件部分</td>
+</tr>
+<tr>
+<td style="text-align:left">暂存区（Staged Snapshot）</td>
+<td>文件执行 git add . 后存的地方</td>
+</tr>
+<tr>
+<td style="text-align:left">工作区（Working Directory）</td>
+<td>文件执行 git commit . 后存的地方</td>
+</tr>
+</tbody>
+</table>
+<p>它们三者之间的关系：<br>
+<img src="https://s1.ax1x.com/2018/08/15/PRU08P.png" alt="PRU08P.png"><br>
+当我们执行 checkout 操作的时候， git 会检查工作区是否存在未跟踪文件。当我们的工作区存在未跟踪的文件时，执行 checkout 的时候会出现错误提示。</p>
 
                 
 
@@ -349,13 +268,9 @@ symbolicatecrash 可以帮助我们很好的分析 crash 日志，但是有它�
                 <!-- Pager -->
                 <ul class="pager">
                     
-                        <li class="previous">
-                            <a href="/2018/08/08/iOS-图片处理的小-Tips/" data-toggle="tooltip" data-placement="top" title="iOS 图片处理的小 Tips">&larr; Previous Post</a>
-                        </li>
-                    
                     
                         <li class="next">
-                            <a href="/2018/07/30/“从面试题中看GCD”/" data-toggle="tooltip" data-placement="top" title="“从面试题中看GCD”">Next Post &rarr;</a>
+                            <a href="/2018/08/08/iOS-图片处理的小-Tips/" data-toggle="tooltip" data-placement="top" title="iOS 图片处理的小 Tips">Next Post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -385,7 +300,7 @@ symbolicatecrash 可以帮助我们很好的分析 crash 日志，但是有它�
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">iOS Crash 的知识梳理</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">1. 常见的 crash 类型</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.1.</span> <span class="toc-nav-text">1. 1 OC Exception</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.2.</span> <span class="toc-nav-text">1.2  Mach Exception</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.3.</span> <span class="toc-nav-text">1.3 Unix Signal Exceptions</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">2. iOS Crash 日志</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.1.</span> <span class="toc-nav-text">2.1 日志结构</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.2.</span> <span class="toc-nav-text">2.2 符号化</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.3.</span> <span class="toc-nav-text">3.实际应用</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.4.</span> <span class="toc-nav-text">4. 后续</span></a></li></ol></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">解决 git checkout a 出现的问题</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">解决方案</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">原因分析</span></a></li></ol></li></ol>
         
         </div>
       </aside>
@@ -406,6 +321,8 @@ symbolicatecrash 可以帮助我们很好的分析 crash 日志，但是有它�
                     <div class="tags">
                        
                           <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
+                        
+                          <a class="tag" href="/tags/#git" title="git">git</a>
                         
                     </div>
                 </section>
@@ -440,8 +357,8 @@ symbolicatecrash 可以帮助我们很好的分析 crash 日志，但是有它�
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES * * */
     var disqus_shortname = "your-disqus-ID";
-    var disqus_identifier = "https://puqin2333.github.io/2018/08/04/iOS-Crash-的学习/";
-    var disqus_url = "https://puqin2333.github.io/2018/08/04/iOS-Crash-的学习/";
+    var disqus_identifier = "https://puqin2333.github.io/2018/08/15/解决-git-checkout-a-出现的问题/";
+    var disqus_url = "https://puqin2333.github.io/2018/08/15/解决-git-checkout-a-出现的问题/";
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
