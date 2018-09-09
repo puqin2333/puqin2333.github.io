@@ -90,9 +90,9 @@
                     <div class="post-heading">
                         <div class="tags">
                             
-                              <a class="tag" href="/tags/#计算机网络" title="计算机网络">计算机网络</a>
-                            
                               <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
+                            
+                              <a class="tag" href="/tags/#计算机网络" title="计算机网络">计算机网络</a>
                             
                         </div>
                         <h1>iOS常见的面试题</h1>
@@ -417,74 +417,69 @@ MVC暴露出来的问题：C层的过于臃肿，M层的轻便，以及网络逻
 <p>首先，了解一下下面这张图<br>
 <img src="media/15233685174618/15341732740739.png" alt=""></p>
 <ol>
-<li>main 函数：程序的入口函数，它的函数内部</li>
+<li>main 函数：程序的入口函数，它的函数内部	<br>
+<code>@autoreleasepool { return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class])); }</code></li>
 </ol>
-<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@autoreleasepool</span> &#123;  </span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">UIApplicationMain</span>(argc, argv, <span class="literal">nil</span>, <span class="built_in">NSStringFromClass</span>([AppDelegate <span class="keyword">class</span>]));  </span><br><span class="line">    &#125;</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">就是这段代码。 可以看到就执行了<span class="built_in">UIApplicationMain</span> 函数。</span><br><span class="line"> <span class="number">2.</span> <span class="built_in">UIApplicationMain</span> 函数的几个参数：</span><br></pre></td></tr></table></figure>
-<p>/* @param argc 系统参数</p>
+<p>就是这段代码。 可以看到就执行了UIApplicationMain 函数。</p>
+<ol start="2">
+<li>UIApplicationMain 函数的几个参数：</li>
+</ol>
+<figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* <span class="doctag">@param</span> argc 系统参数</span></span><br><span class="line"><span class="comment">* <span class="doctag">@param</span> argv 系统参数 </span></span><br><span class="line"><span class="comment">* <span class="doctag">@param</span> nil 应用程序名</span></span><br><span class="line"><span class="comment">* <span class="doctag">@param</span> class 应用程序代理名称</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span> </span><br><span class="line">UIApplicationMain(<span class="keyword">int</span> argc, charchar *argv[], NSString *principalClassName, NSString *delegateClassName);</span><br></pre></td></tr></table></figure>
+<p>UIApplicationMain 函数的作用：UIApplicationMain会根据函数第三个参数创建 UIApplication对象，根据第四个参数创建一个 delegate对象，并将该 delegate 对象赋值给 UIApplication 对象中的 delegate 属性。接着会建立应用程序的 Main RunLoop，进行事件的处理。</p>
+<ol start="3">
+<li>事件处理时，首先会在程序完毕后调用 delegate 的 <code>didFinshLaunchingWithOptions:</code> 方法。APP 启动的时候，会调用 info.plist 文件，看是否指定了 main.storyboard ，如果设置了就去加载 main.storyboard。如果没有设置，就需要我们去手动创建 UIWindow（它作为一个容器，容纳所有的 UIView，并且 UIWindow会将事件消息传递给 UIView）。</li>
+<li>接下来就是控制器以及控制器view的创建,，具体可以了解控制器的生命周期。</li>
+</ol>
+<p>从上面的这个流程，我们可以发现它包括五种状态：</p>
 <ul>
-<li>@param argv 系统参数</li>
-<li>@param nil 应用程序名</li>
-<li>@param class 应用程序代理名称</li>
+<li>Not running（未运行）：程序未启动</li>
+<li>Inactive（未激活）：其他两个状态切换时出现的短暂状态。当用户锁屏或者系统提示用户去响应 Alert窗口（如来电、信息等）时</li>
+<li>Active（激活）：在屏幕下显示正常的运行状态，该状态下可以接受用户输入并及时更新显示</li>
+<li>Background（后台）：：程序在后台且能执行代码。用户按下Home键不久后进入此状态（先进入了   Inactive状态，再进入Background状态），然后会迅速进入挂起状态(Suspended)。有的程序经过特殊的请求后可以长期处于Backgroud状态</li>
+<li>Suspended （挂起）：程序在后台不能执行代码。普通程序在进入Background状态不久后就会进入此状态。当挂起时，程序还是停留在内存中的，当系统内存低时，系统就把挂起的程序清除掉，为前台程序提供更多的内存</li>
 </ul>
-<p>*/<br>
-UIApplicationMain(int argc, charchar *argv[], NSString *principalClassName, NSString *delegateClassName);</p>
-<pre><code>
-UIApplicationMain 函数的作用：UIApplicationMain会根据函数第三个参数创建 UIApplication对象，根据第四个参数创建一个 delegate对象，并将该 delegate 对象赋值给 UIApplication 对象中的 delegate 属性。接着会建立应用程序的 Main RunLoop，进行事件的处理。
- 3. 事件处理时，首先会在程序完毕后调用 delegate 的 `didFinshLaunchingWithOptions:` 方法。APP 启动的时候，会调用 info.plist 文件，看是否指定了 main.storyboard ，如果设置了就去加载 main.storyboard。如果没有设置，就需要我们去手动创建 UIWindow（它作为一个容器，容纳所有的 UIView，并且 UIWindow会将事件消息传递给 UIView）。
- 4. 接下来就是控制器以及控制器view的创建,，具体可以了解控制器的生命周期。
- 
- 从上面的这个流程，我们可以发现它包括五种状态：
-  - Not running（未运行）：程序未启动
-  - Inactive（未激活）：其他两个状态切换时出现的短暂状态。当用户锁屏或者系统提示用户去响应 Alert窗口（如来电、信息等）时
-  - Active（激活）：在屏幕下显示正常的运行状态，该状态下可以接受用户输入并及时更新显示
-  - Background（后台）：：程序在后台且能执行代码。用户按下Home键不久后进入此状态（先进入了   Inactive状态，再进入Background状态），然后会迅速进入挂起状态(Suspended)。有的程序经过特殊的请求后可以长期处于Backgroud状态
-  - Suspended （挂起）：程序在后台不能执行代码。普通程序在进入Background状态不久后就会进入此状态。当挂起时，程序还是停留在内存中的，当系统内存低时，系统就把挂起的程序清除掉，为前台程序提供更多的内存
-  
-#### 2.5 UIView、CALayer 以及 UIWindow 有什么区别？
-**UIView 与 CALayer 区别：**
-1. 事件响应：UIView 和 CALayer 最终都是继承自 NSObject,但是 UIView 直接继承自 UIResponder, 正是因为这层继承，才可以让UIView 可以响应事件。
-2. View 和 Layer 的 Frame 映射：一个 Layer 的 frame 是由它的 anchorPoint、position、bounds 和 transform 共同决定，而一个 View 的 frame 只是简单的返回 Layer 的 frame，同样 View 的 Center 和 Bounds 只是直接返回layer 对应的 Position 和 Bounds。在初始化view的时候，会调用私有方法[UIView _cretaelayerWithFrame] 去创建 CALayer
-3. UIView 主要是对显示内容的管理，而CALayer 主要侧重于显示内容的绘制：UIView 是 CALayer 的 CALayerDelegate ，在 View 显示的时候，UIView 作为 Layer 的 CALayerDelegate，view 的显示内容由内部的 CALayer display。
-4. 在做 iOS 动画的时候，修改非 rootLayer 的属性会默认产生隐式动画，而修改UIView 则不会。 
-**UIWindow** 是 UIView 的子视图，UIWindow 在应用中是作为根视图来承载UIView的。UIWindow提供一个区域（一般就是整个屏幕）来显示UIView，并且将事件分发给UIView。一个应用一般只有一个UIWindow，但特殊情况也会创建子UIWindow。
-详细的，可以阅读[这篇博客](https://puqin2333.github.io/2018/03/18/UIView-与-CALayer的学习/)
-#### 2.6 谈谈你对 UIResponder 的响应者链的理解。 
-响应链是由一系列链接在一起的响应者组成的。一般情况下，一条响应链开始于第一响应者，结束于application对象。如果一个响应者不能处理事件，则会将事件沿着响应链传到下一响应者。
-在 APP 中，所有的视图是按照树状层次结构组织起来的。
-当用户触发某一事件后，UIKit 会创建一个事件对象，并且会被放入一个事件队列中，按照先进先出的顺序来处理。当处理事件时，UIApplication 对象会从队列头部取出一个事件对象，并将其分发出去。通常是将事件先分发给程序的主 window 对象，window对象会首先尝试将事件分发给触摸事件发生的那个视图上。系统使用hit-testing来找到触摸下的视图，它检测一个触摸事件是否发生在相应视图对象的边界之内(即视图的frame属性，这也是为什么子视图如果在父视图的frame之外时，是无法响应事件的)。如果在，则会递归检测其所有的子视图。包含触摸点的视图层次架构中最底层的视图就是hit-test视图。在检测出hit-test视图后，系统就将事件发送给这个视图来进行处理。
-
-#### 2.7 iOS 触摸事件都经历了什么？
-首先，苹果会注册一个 source1 （基于 mach port）用来接收系统事件。
-当我们用手指触摸屏幕时，首先 IOKit.framework 会生成一个 IOHIDEvent 事件并由 SpringBoard 接收，SpringBoard 用 mart port(IPC进程间通信) 转发给需要的 APP 进程，随后苹果注册的 source1 事件就会内部触发 source0 回调 _UIApplicationHandleEvent() 进行应用内分发。接着进行 source 0 回调，内部封装 IOHDEvent 为 UIEvent，把事件加入 UIApplication 管理事件队列中，调用 UIApplication 的 sendEvent 方法将 UIEvent 传给 UIWindow。接着事件会按照 UIApplication -&gt; UIWindow -&gt; SuperView -&gt; SubView 的顺序检测，检测调用的方法为 hitTest 和 pointInside。
-
-整体经历了四个大过程：
-- 起始阶段： CPU处于睡眠状态、等待事件 -&gt; 产生事件
-- 系统响应阶段： 屏幕硬件感应到事件、传递到 IOKit -&gt; 将事件封装为 IOHIDEvent对象 -&gt; IOKit 通过IPC（进程间的通信）将事件给 SpringBoard(iOS 系统桌面)
-- SpringBoard 响应阶段：Spring 主线程的 RunLoop 接收到 IOKit  -&gt; 唤醒RunLoop，触发 Mart Port的 Sorce1 回调 -&gt; SpringBoard 检测是否有App在前台，若有，SpringBoard 则通过 IPC 转发给对应的 App。若没有，则自身触发 Source0 回调 。
-- APP 内部响应：前台 App 主线程的 RunLoop 收到 SpringBorad 转发来的消息并苏醒，触发对应 Mach Port的Source1 回调 -&gt; Source1 回调，内部触发 Source0 回调__UIApplicationHandleEventQueue() -&gt; Source0 回调，内部封装 IOHIDEvet 为 UIEvent，把事件加入 UIApplication 管理的事件队列中，调用 UIApplication 的 sendEvent 方法将 UIEvent 传给了 UIWindow -&gt;  事件会按照 UIApplication -&gt; UIWindow -&gt; SuperView -&gt; SubView 的顺序不断的检测，检测的方法为 hitTest 和 pointInside。
-
-#### 2.8 iOS 多线程都有哪些？你在什么地方用过？
-考察：三种多线程技术，以及各自的区别。你在什么地方使用，就是考虑你对与各自使用场景的了解。
-
-iOS 有 三种多线程编程的技术，分别是：
-NSThread、NSOperation 和NSOperationQueue 、GCD 三种形式
-NSThread 比另外两个轻量级，但是需要自己管理线程的生命周期、线程同步
-Operation Queue 建立在 GCD 的基础上，面向对象，相对于 GCD 来说，使用 Operation Queue 会增加一点额外开销，我们可以给 operate 之间添加依赖关系、可以取消一个正在执行的operation、暂停和恢复 operation queue等。
-GCD：是一种更轻量级的，以FIFO的顺序执行并发任务的方式，使用 GCD 我们不用关心任务的调度情况。
-
-GCD 与 NSOperation 的区别主要表现在以下几方面：
-1) GCD是一套 C 语言API,执行和操作简单高效，因此NSOperation底层也通过GCD实现，这是他们之间最本质的区别.因此如果希望自定义任务，建议使用NSOperation；
-2) 依赖关系，NSOperation可以设置操作之间的依赖(可以跨队列设置)，GCD无法设置依赖关系，不过可以通过同步来实现这种效果；
-3) KVO(键值对观察)，NSOperation容易判断操作当前的状态(是否执行，是否取消等)，对此GCD无法通过KVO进行判断；
-4) 优先级，NSOperation可以设置自身的优先级，但是优先级高的不一定先执行，GCD只能设置队列的优先级，如果要区分block任务的优先级,需要很复杂的代码才能实现；
-5) 继承，NSOperation是一个抽象类.实际开发中常用的是它的两个子类:NSInvocationOperation和NSBlockOperation，同样我们可以自定义NSOperation，GCD执行任务可以自由组装，没有继承那么高的代码复用度；
-6) 效率，直接使用GCD效率确实会更高效，NSOperation会多一点开销，但是通过NSOperation可以获得依赖，优先级，继承，键值对观察这些优势，相对于多的那么一点开销确实很划算，鱼和熊掌不可得兼，取舍在于开发者自己；
-7)可以随时取消准备执行的任务(已经在执行的不能取消),GCD没法停止已经加入queue 的 block(虽然也能实现,但是需要很复杂的代码)
-
-####
-
-
-</code></pre>
+<h4><span id="25-uiview-calayer-以及-uiwindow-有什么区别">2.5 UIView、CALayer 以及 UIWindow 有什么区别？</span></h4>
+<p><strong>UIView 与 CALayer 区别：</strong></p>
+<ol>
+<li>事件响应：UIView 和 CALayer 最终都是继承自 NSObject,但是 UIView 直接继承自 UIResponder, 正是因为这层继承，才可以让UIView 可以响应事件。</li>
+<li>View 和 Layer 的 Frame 映射：一个 Layer 的 frame 是由它的 anchorPoint、position、bounds 和 transform 共同决定，而一个 View 的 frame 只是简单的返回 Layer 的 frame，同样 View 的 Center 和 Bounds 只是直接返回layer 对应的 Position 和 Bounds。在初始化view的时候，会调用私有方法[UIView _cretaelayerWithFrame] 去创建 CALayer</li>
+<li>UIView 主要是对显示内容的管理，而CALayer 主要侧重于显示内容的绘制：UIView 是 CALayer 的 CALayerDelegate ，在 View 显示的时候，UIView 作为 Layer 的 CALayerDelegate，view 的显示内容由内部的 CALayer display。</li>
+<li>在做 iOS 动画的时候，修改非 rootLayer 的属性会默认产生隐式动画，而修改UIView 则不会。<br>
+<strong>UIWindow</strong> 是 UIView 的子视图，UIWindow 在应用中是作为根视图来承载UIView的。UIWindow提供一个区域（一般就是整个屏幕）来显示UIView，并且将事件分发给UIView。一个应用一般只有一个UIWindow，但特殊情况也会创建子UIWindow。<br>
+详细的，可以阅读<a href="https://puqin2333.github.io/2018/03/18/UIView-%E4%B8%8E-CALayer%E7%9A%84%E5%AD%A6%E4%B9%A0/">这篇博客</a></li>
+</ol>
+<h4><span id="26-谈谈你对-uiresponder-的响应者链的理解">2.6 谈谈你对 UIResponder 的响应者链的理解。</span></h4>
+<p>响应链是由一系列链接在一起的响应者组成的。一般情况下，一条响应链开始于第一响应者，结束于application对象。如果一个响应者不能处理事件，则会将事件沿着响应链传到下一响应者。<br>
+在 APP 中，所有的视图是按照树状层次结构组织起来的。<br>
+当用户触发某一事件后，UIKit 会创建一个事件对象，并且会被放入一个事件队列中，按照先进先出的顺序来处理。当处理事件时，UIApplication 对象会从队列头部取出一个事件对象，并将其分发出去。通常是将事件先分发给程序的主 window 对象，window对象会首先尝试将事件分发给触摸事件发生的那个视图上。系统使用hit-testing来找到触摸下的视图，它检测一个触摸事件是否发生在相应视图对象的边界之内(即视图的frame属性，这也是为什么子视图如果在父视图的frame之外时，是无法响应事件的)。如果在，则会递归检测其所有的子视图。包含触摸点的视图层次架构中最底层的视图就是hit-test视图。在检测出hit-test视图后，系统就将事件发送给这个视图来进行处理。</p>
+<h4><span id="27-ios-触摸事件都经历了什么">2.7 iOS 触摸事件都经历了什么？</span></h4>
+<p>首先，苹果会注册一个 source1 （基于 mach port）用来接收系统事件。<br>
+当我们用手指触摸屏幕时，首先 IOKit.framework 会生成一个 IOHIDEvent 事件并由 SpringBoard 接收，SpringBoard 用 mart port(IPC进程间通信) 转发给需要的 APP 进程，随后苹果注册的 source1 事件就会内部触发 source0 回调 _UIApplicationHandleEvent() 进行应用内分发。接着进行 source 0 回调，内部封装 IOHDEvent 为 UIEvent，把事件加入 UIApplication 管理事件队列中，调用 UIApplication 的 sendEvent 方法将 UIEvent 传给 UIWindow。接着事件会按照 UIApplication -&gt; UIWindow -&gt; SuperView -&gt; SubView 的顺序检测，检测调用的方法为 hitTest 和 pointInside。</p>
+<p>整体经历了四个大过程：</p>
+<ul>
+<li>起始阶段： CPU处于睡眠状态、等待事件 -&gt; 产生事件</li>
+<li>系统响应阶段： 屏幕硬件感应到事件、传递到 IOKit -&gt; 将事件封装为 IOHIDEvent对象 -&gt; IOKit 通过IPC（进程间的通信）将事件给 SpringBoard(iOS 系统桌面)</li>
+<li>SpringBoard 响应阶段：Spring 主线程的 RunLoop 接收到 IOKit  -&gt; 唤醒RunLoop，触发 Mart Port的 Sorce1 回调 -&gt; SpringBoard 检测是否有App在前台，若有，SpringBoard 则通过 IPC 转发给对应的 App。若没有，则自身触发 Source0 回调 。</li>
+<li>APP 内部响应：前台 App 主线程的 RunLoop 收到 SpringBorad 转发来的消息并苏醒，触发对应 Mach Port的Source1 回调 -&gt; Source1 回调，内部触发 Source0 回调__UIApplicationHandleEventQueue() -&gt; Source0 回调，内部封装 IOHIDEvet 为 UIEvent，把事件加入 UIApplication 管理的事件队列中，调用 UIApplication 的 sendEvent 方法将 UIEvent 传给了 UIWindow -&gt;  事件会按照 UIApplication -&gt; UIWindow -&gt; SuperView -&gt; SubView 的顺序不断的检测，检测的方法为 hitTest 和 pointInside。</li>
+</ul>
+<h4><span id="28-ios-多线程都有哪些你在什么地方用过">2.8 iOS 多线程都有哪些？你在什么地方用过？</span></h4>
+<p>考察：三种多线程技术，以及各自的区别。你在什么地方使用，就是考虑你对与各自使用场景的了解。</p>
+<p>iOS 有 三种多线程编程的技术，分别是：<br>
+NSThread、NSOperation 和NSOperationQueue 、GCD 三种形式<br>
+NSThread 比另外两个轻量级，但是需要自己管理线程的生命周期、线程同步<br>
+Operation Queue 建立在 GCD 的基础上，面向对象，相对于 GCD 来说，使用 Operation Queue 会增加一点额外开销，我们可以给 operate 之间添加依赖关系、可以取消一个正在执行的operation、暂停和恢复 operation queue等。<br>
+GCD：是一种更轻量级的，以FIFO的顺序执行并发任务的方式，使用 GCD 我们不用关心任务的调度情况。</p>
+<p>GCD 与 NSOperation 的区别主要表现在以下几方面：</p>
+<ol>
+<li>GCD是一套 C 语言API,执行和操作简单高效，因此NSOperation底层也通过GCD实现，这是他们之间最本质的区别.因此如果希望自定义任务，建议使用NSOperation；</li>
+<li>依赖关系，NSOperation可以设置操作之间的依赖(可以跨队列设置)，GCD无法设置依赖关系，不过可以通过同步来实现这种效果；</li>
+<li>KVO(键值对观察)，NSOperation容易判断操作当前的状态(是否执行，是否取消等)，对此GCD无法通过KVO进行判断；</li>
+<li>优先级，NSOperation可以设置自身的优先级，但是优先级高的不一定先执行，GCD只能设置队列的优先级，如果要区分block任务的优先级,需要很复杂的代码才能实现；</li>
+<li>继承，NSOperation是一个抽象类.实际开发中常用的是它的两个子类:NSInvocationOperation和NSBlockOperation，同样我们可以自定义NSOperation，GCD执行任务可以自由组装，没有继承那么高的代码复用度；</li>
+<li>效率，直接使用GCD效率确实会更高效，NSOperation会多一点开销，但是通过NSOperation可以获得依赖，优先级，继承，键值对观察这些优势，相对于多的那么一点开销确实很划算，鱼和熊掌不可得兼，取舍在于开发者自己；<br>
+7)可以随时取消准备执行的任务(已经在执行的不能取消),GCD没法停止已经加入queue 的 block(虽然也能实现,但是需要很复杂的代码)</li>
+</ol>
+<h4><span id=""></span></h4>
 
                 
 
@@ -528,7 +523,7 @@ GCD 与 NSOperation 的区别主要表现在以下几方面：
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">iOS 常见面试题（持续更新）</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">1 Objective-C 基础部分</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.1.</span> <span class="toc-nav-text">1.1 为什么说 Objective-C 是一门动态的语言？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.2.</span> <span class="toc-nav-text">1.2 属性的实质是什么？包括哪几部分？属性默认的关键字有哪些？属性中的 ivar、getter、setter 是如何生成并添加到这个类中？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.3.</span> <span class="toc-nav-text">1.3 @dynamic 关键字和 @synthesize 关键字是用来做什么的？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.4.</span> <span class="toc-nav-text">1.4 @synthesize合成实例变量的规则是什么？假如property名为foo，存在一个名为_foo的实例变量，那么还会自动合成新变量么？在有了自动合成属性实例变量之后，@synthesize还有哪些使用场景？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.5.</span> <span class="toc-nav-text">1.5 Objective-C 的属性关键字都有哪些？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.6.</span> <span class="toc-nav-text">1.6 NSString为什么要用copy关键字，如果用strong会有什么问题？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.7.</span> <span class="toc-nav-text">1.7 assign 与 weak 关键字有什么区别？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.8.</span> <span class="toc-nav-text">1.8 nonatomic和atomic的区别？atomic是绝对的线程安全么？为什么？如果不是，那应该如何实现？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.9.</span> <span class="toc-nav-text">1.9 NSCache优于NSDictionary的几点？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.10.</span> <span class="toc-nav-text">1.10 Objective-C 中， instancetype 与 id 类型的异同点</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.11.</span> <span class="toc-nav-text">1.11 Objective-C 中 self 和 super 的理解，以下代码的输出答案是什么？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.12.</span> <span class="toc-nav-text">1.12 Objective-C 中 load 和 initialize 方法有什么区别？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.13.</span> <span class="toc-nav-text">1.13 如何令自己所写的对象具有拷贝功能?</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.14.</span> <span class="toc-nav-text">1.14 可变集合类 和 不可变集合类的 copy 和 mutablecopy有什么区别？如果是集合是内容复制的话，集合里面的元素也是内容复制么？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.15.</span> <span class="toc-nav-text">1.15 为什么代理要用 weak ? 代理的 delegate 和 dataSource 有什么区别？ block 和代理的区别？</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">2. iOS 基础部分</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.1.</span> <span class="toc-nav-text">2.1 iOS 中常见的设计模式都有哪些？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.2.</span> <span class="toc-nav-text">2.2 讲一下你理解的 MVC 和 MVVM、MVP ？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.3.</span> <span class="toc-nav-text">2.3 iOS 中的看门狗机制是什么？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.4.</span> <span class="toc-nav-text">2.4 说一下 iOS 应用程序的启动执行都经历了哪些步骤？应用程序包含几种状态？</span></a></li></ol></li></ol></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">iOS 常见面试题（持续更新）</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">1 Objective-C 基础部分</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.1.</span> <span class="toc-nav-text">1.1 为什么说 Objective-C 是一门动态的语言？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.2.</span> <span class="toc-nav-text">1.2 属性的实质是什么？包括哪几部分？属性默认的关键字有哪些？属性中的 ivar、getter、setter 是如何生成并添加到这个类中？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.3.</span> <span class="toc-nav-text">1.3 @dynamic 关键字和 @synthesize 关键字是用来做什么的？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.4.</span> <span class="toc-nav-text">1.4 @synthesize合成实例变量的规则是什么？假如property名为foo，存在一个名为_foo的实例变量，那么还会自动合成新变量么？在有了自动合成属性实例变量之后，@synthesize还有哪些使用场景？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.5.</span> <span class="toc-nav-text">1.5 Objective-C 的属性关键字都有哪些？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.6.</span> <span class="toc-nav-text">1.6 NSString为什么要用copy关键字，如果用strong会有什么问题？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.7.</span> <span class="toc-nav-text">1.7 assign 与 weak 关键字有什么区别？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.8.</span> <span class="toc-nav-text">1.8 nonatomic和atomic的区别？atomic是绝对的线程安全么？为什么？如果不是，那应该如何实现？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.9.</span> <span class="toc-nav-text">1.9 NSCache优于NSDictionary的几点？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.10.</span> <span class="toc-nav-text">1.10 Objective-C 中， instancetype 与 id 类型的异同点</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.11.</span> <span class="toc-nav-text">1.11 Objective-C 中 self 和 super 的理解，以下代码的输出答案是什么？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.12.</span> <span class="toc-nav-text">1.12 Objective-C 中 load 和 initialize 方法有什么区别？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.13.</span> <span class="toc-nav-text">1.13 如何令自己所写的对象具有拷贝功能?</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.14.</span> <span class="toc-nav-text">1.14 可变集合类 和 不可变集合类的 copy 和 mutablecopy有什么区别？如果是集合是内容复制的话，集合里面的元素也是内容复制么？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.1.15.</span> <span class="toc-nav-text">1.15 为什么代理要用 weak ? 代理的 delegate 和 dataSource 有什么区别？ block 和代理的区别？</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">2. iOS 基础部分</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.1.</span> <span class="toc-nav-text">2.1 iOS 中常见的设计模式都有哪些？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.2.</span> <span class="toc-nav-text">2.2 讲一下你理解的 MVC 和 MVVM、MVP ？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.3.</span> <span class="toc-nav-text">2.3 iOS 中的看门狗机制是什么？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.4.</span> <span class="toc-nav-text">2.4 说一下 iOS 应用程序的启动执行都经历了哪些步骤？应用程序包含几种状态？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.5.</span> <span class="toc-nav-text">2.5 UIView、CALayer 以及 UIWindow 有什么区别？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.6.</span> <span class="toc-nav-text">2.6 谈谈你对 UIResponder 的响应者链的理解。</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.7.</span> <span class="toc-nav-text">2.7 iOS 触摸事件都经历了什么？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.8.</span> <span class="toc-nav-text">2.8 iOS 多线程都有哪些？你在什么地方用过？</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-number">1.2.9.</span> <span class="toc-nav-text"></span></a></li></ol></li></ol></li></ol>
         
         </div>
       </aside>
@@ -548,9 +543,9 @@ GCD 与 NSOperation 的区别主要表现在以下几方面：
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
-                          <a class="tag" href="/tags/#计算机网络" title="计算机网络">计算机网络</a>
-                        
                           <a class="tag" href="/tags/#iOS" title="iOS">iOS</a>
+                        
+                          <a class="tag" href="/tags/#计算机网络" title="计算机网络">计算机网络</a>
                         
                     </div>
                 </section>
