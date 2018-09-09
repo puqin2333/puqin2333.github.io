@@ -146,14 +146,14 @@
 
                         
                         <li>
-                            <a href="/archive/">Archives</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/archive/">Archives</a>
                         </li>
                         
                     
@@ -419,7 +419,7 @@ MVC暴露出来的问题：C层的过于臃肿，M层的轻便，以及网络逻
 <ol>
 <li>main 函数：程序的入口函数，它的函数内部</li>
 </ol>
-<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@autoreleasepool</span> &#123;  </span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">UIApplicationMain</span>(argc, argv, <span class="literal">nil</span>, <span class="built_in">NSStringFromClass</span>([AppDelegate <span class="keyword">class</span>]));  </span><br><span class="line">    &#125;</span><br><span class="line">``` </span><br><span class="line">就是这段代码。 可以看到就执行了<span class="built_in">UIApplicationMain</span> 函数。</span><br><span class="line"> <span class="number">2.</span> <span class="built_in">UIApplicationMain</span> 函数的几个参数：</span><br></pre></td></tr></table></figure>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@autoreleasepool</span> &#123;  </span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">UIApplicationMain</span>(argc, argv, <span class="literal">nil</span>, <span class="built_in">NSStringFromClass</span>([AppDelegate <span class="keyword">class</span>]));  </span><br><span class="line">    &#125;</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">就是这段代码。 可以看到就执行了<span class="built_in">UIApplicationMain</span> 函数。</span><br><span class="line"> <span class="number">2.</span> <span class="built_in">UIApplicationMain</span> 函数的几个参数：</span><br></pre></td></tr></table></figure>
 <p>/* @param argc 系统参数</p>
 <ul>
 <li>@param argv 系统参数</li>
