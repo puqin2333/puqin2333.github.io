@@ -417,11 +417,8 @@ MVC暴露出来的问题：C层的过于臃肿，M层的轻便，以及网络逻
 <p>首先，了解一下下面这张图<br>
 <img src="media/15233685174618/15341732740739.png" alt=""></p>
 <ol>
-<li>main 函数：程序的入口函数，它的函数内部	<br>
-<code>@autoreleasepool { return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class])); }</code></li>
-</ol>
-<p>就是这段代码。 可以看到就执行了UIApplicationMain 函数。</p>
-<ol start="2">
+<li>main 函数：程序的入口函数，它的函数内部	 <code>@autoreleasepool { return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class])); }</code><br>
+就是这段代码。 可以看到就执行了UIApplicationMain 函数。</li>
 <li>UIApplicationMain 函数的几个参数：</li>
 </ol>
 <figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* <span class="doctag">@param</span> argc 系统参数</span></span><br><span class="line"><span class="comment">* <span class="doctag">@param</span> argv 系统参数 </span></span><br><span class="line"><span class="comment">* <span class="doctag">@param</span> nil 应用程序名</span></span><br><span class="line"><span class="comment">* <span class="doctag">@param</span> class 应用程序代理名称</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span> </span><br><span class="line">UIApplicationMain(<span class="keyword">int</span> argc, charchar *argv[], NSString *principalClassName, NSString *delegateClassName);</span><br></pre></td></tr></table></figure>
